@@ -1,0 +1,5 @@
+
+# pasta dos executáveis
+target/*
+
+.vscode/*
