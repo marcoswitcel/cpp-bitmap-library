@@ -22,4 +22,12 @@ typedef struct Bitmap_File_Header {
   uint32_t offset;
 } Bitmap_File_Header;
 
+/**
+ * @brief DIB Header - Bitmap Informatio Header
+ * @todo João, implementar
+ */
+typedef struct DIB_Header {
+
+} DIB_Header;
+
 #endif // __BITMAP_CPP_
