@@ -42,6 +42,8 @@ typedef struct DIB_Header {
   uint32_t size_of_data;
   uint32_t print_resolution_horizontal;
   uint32_t print_resolution_vertical;
+  uint32_t n_colors_in_palette;
+  uint32_t important_colors;
 
 } DIB_Header;
 
