@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "./bitmapy.cpp"
+#include "./bitmap.cpp"
 
 int main(void)
 {
