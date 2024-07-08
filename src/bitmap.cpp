@@ -40,7 +40,6 @@ typedef struct DIB_Header {
    * @brief Tamanho dos dados de imagem em bytes incluindo padding
    */
   uint32_t size_of_data;
-  uint32_t bitfield;
   uint32_t print_resolution_horizontal;
   uint32_t print_resolution_vertical;
 
