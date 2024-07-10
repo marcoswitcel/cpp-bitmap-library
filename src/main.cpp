@@ -24,10 +24,22 @@ Byte_Array read_file_as_byte_array(const char *file_path)
 
   fclose(fd);
 
-  return (Byte_Array) {
+  Byte_Array array = {
     .data = buffer,
     .size = file_size, 
   };
+
+  return array;
+}
+
+Bitmap_File_Header extract_bitmap_file_header_from_byte_array(Byte_Array byte_array)
+{
+  Bitmap_File_Header header = {};
+
+  header.header[0] = byte_array.data[0]; // B
+  header.header[1] = byte_array.data[1]; // M
+  
+  return header;
 }
 
 int main(int argc, const char* argv[])
@@ -45,6 +57,10 @@ int main(int argc, const char* argv[])
   auto file = read_file_as_byte_array(file_path);
 
   printf("file size: %ld\n", file.size);
+
+  Bitmap_File_Header bmp_header = extract_bitmap_file_header_from_byte_array(file);
+
+  printf("%c %c", bmp_header.header[0], bmp_header.header[1]);
 
   return EXIT_SUCCESS;
 }
