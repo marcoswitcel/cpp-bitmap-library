@@ -38,6 +38,16 @@ Bitmap_File_Header extract_bitmap_file_header_from_byte_array(Byte_Array byte_ar
 
   header.header[0] = byte_array.data[0]; // B
   header.header[1] = byte_array.data[1]; // M
+
+  // @todo João, verificar como fazer para identificação da endianess do sistema para implementar
+  // o código necessário para Big Endian
+  header.size = *((uint32_t*) &byte_array.data[2]);
+
+  header.application_specific = *((uint16_t*) &byte_array.data[6]);
+  header.application_specific2 = *((uint16_t*) &byte_array.data[8]);
+
+  // @todo João, suportart Big Endian
+  header.offset = *((uint32_t*) &byte_array.data[10]);
   
   return header;
 }
@@ -60,7 +70,9 @@ int main(int argc, const char* argv[])
 
   Bitmap_File_Header bmp_header = extract_bitmap_file_header_from_byte_array(file);
 
-  printf("%c %c", bmp_header.header[0], bmp_header.header[1]);
+  printf("%c %c\n", bmp_header.header[0], bmp_header.header[1]);
+  printf("header: file size: %d\n", bmp_header.size);
+  printf("header: file offset: %d\n", bmp_header.offset);
 
   return EXIT_SUCCESS;
 }

@@ -17,8 +17,8 @@ typedef struct Bitmap {
 typedef struct Bitmap_File_Header {
   uint8_t header[2];
   uint32_t size;
-  uint8_t application_specific[2];
-  uint8_t application_specific2[2];
+  uint16_t application_specific;
+  uint16_t application_specific2;
   uint32_t offset;
 } Bitmap_File_Header;
 
