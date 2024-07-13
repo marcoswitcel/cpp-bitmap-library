@@ -32,6 +32,13 @@ Byte_Array read_file_as_byte_array(const char *file_path)
   return array;
 }
 
+DIB_Header extract_dib_file_header_from_byte_array(Byte_Array byte_array)
+{
+  DIB_Header dib;
+
+  return  dib;
+}
+
 Bitmap_File_Header extract_bitmap_file_header_from_byte_array(Byte_Array byte_array)
 {
   Bitmap_File_Header header = {};
@@ -69,6 +76,7 @@ int main(int argc, const char* argv[])
   printf("file size: %ld\n", file.size);
 
   Bitmap_File_Header bmp_header = extract_bitmap_file_header_from_byte_array(file);
+  DIB_Header dib_header = extract_dib_file_header_from_byte_array(file);
 
   printf("%c %c\n", bmp_header.header[0], bmp_header.header[1]);
   printf("header: file size: %d\n", bmp_header.size);
