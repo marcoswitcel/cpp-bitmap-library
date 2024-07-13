@@ -22,6 +22,8 @@ typedef struct Bitmap_File_Header {
   uint32_t offset;
 } Bitmap_File_Header;
 
+const unsigned BITMAP_FILE_HEADER_SIZE = 14;
+
 /**
  * @brief DIB Header - Device-Independent Bitmap
  * @todo João, implementar

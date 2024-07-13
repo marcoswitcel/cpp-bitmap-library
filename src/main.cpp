@@ -34,7 +34,12 @@ Byte_Array read_file_as_byte_array(const char *file_path)
 
 DIB_Header extract_dib_file_header_from_byte_array(Byte_Array byte_array)
 {
+  const unsigned dib_header_offset = BITMAP_FILE_HEADER_SIZE;
   DIB_Header dib;
+
+  dib.size = *((uint32_t*) &byte_array.data[dib_header_offset]);
+  dib.image_width = *((uint32_t*) &byte_array.data[dib_header_offset + 4]);
+  dib.image_height = *((uint32_t*) &byte_array.data[dib_header_offset + 8]);
 
   return  dib;
 }
@@ -81,6 +86,9 @@ int main(int argc, const char* argv[])
   printf("%c %c\n", bmp_header.header[0], bmp_header.header[1]);
   printf("header: file size: %d\n", bmp_header.size);
   printf("header: file offset: %d\n", bmp_header.offset);
+  printf("dib: file size: %d\n", dib_header.size);
+  printf("dib: width: %d\n", dib_header.image_width);
+  printf("dib: height: %d\n", dib_header.image_height);
 
   return EXIT_SUCCESS;
 }
