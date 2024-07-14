@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "./bitmap.cpp"
 
@@ -92,6 +93,14 @@ int main(int argc, const char* argv[])
 
   Bitmap_File_Header bmp_header = extract_bitmap_file_header_from_byte_array(file);
   DIB_Header dib_header = extract_dib_file_header_from_byte_array(file);
+
+  /**
+   * @note Os asserts abaixo refletem alguma conclusões que tirei sobre o layout da informação,
+   * conforme for obtendo mais arquivos ".bmp" para analisar, posso validar se as assertivas são
+   * verdadeiras em todas as configurações possíveis dos arquivos ".bmp"
+   */
+  assert((BITMAP_FILE_HEADER_SIZE + dib_header.size) == bmp_header.offset);
+  assert((BITMAP_FILE_HEADER_SIZE + dib_header.size + dib_header.size_of_data) == bmp_header.size);
 
   printf("%c %c\n", bmp_header.header[0], bmp_header.header[1]);
   printf("header: file size: %d\n", bmp_header.size);
