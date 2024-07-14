@@ -45,6 +45,12 @@ DIB_Header extract_dib_file_header_from_byte_array(Byte_Array byte_array)
   dib.n_bit_per_pixel = *((uint16_t*) &byte_array.data[dib_header_offset + 14]);
   dib.bitfield = *((uint32_t*) &byte_array.data[dib_header_offset + 16]);
 
+  dib.size_of_data = *((uint32_t*) &byte_array.data[dib_header_offset + 20]);
+  dib.print_resolution_horizontal = *((uint32_t*) &byte_array.data[dib_header_offset + 24]);
+  dib.print_resolution_vertical = *((uint32_t*) &byte_array.data[dib_header_offset + 28]);
+  dib.n_colors_in_palette = *((uint32_t*) &byte_array.data[dib_header_offset + 32]);
+  dib.important_colors = *((uint32_t*) &byte_array.data[dib_header_offset + 36]);
+
   return  dib;
 }
 
@@ -97,6 +103,11 @@ int main(int argc, const char* argv[])
   printf("dib: number_of_colors: %d\n", dib_header.number_of_colors_planes);
   printf("dib: n_bit_per_pixel: %d\n", dib_header.n_bit_per_pixel);
   printf("dib: bitfield: %d\n", dib_header.bitfield);
+  printf("dib: size_of_data: %d\n", dib_header.size_of_data);
+  printf("dib: print_resolution_horizontal: %d\n", dib_header.print_resolution_horizontal);
+  printf("dib: print_resolution_vertical: %d\n", dib_header.print_resolution_vertical);
+  printf("dib: n_colors_in_palette: %d\n", dib_header.n_colors_in_palette);
+  printf("dib: important_colors: %d\n", dib_header.important_colors);
 
   printf("first pixel: red: %d\n", file.data[bmp_header.offset + 0]);
   printf("first pixel: green: %d\n", file.data[bmp_header.offset + 1]);
