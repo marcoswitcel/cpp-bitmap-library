@@ -126,6 +126,13 @@ int main(int argc, const char* argv[])
   printf("second pixel: green: %d\n", file.data[bmp_header.offset + 4]);
   printf("second pixel: blue: %d\n", file.data[bmp_header.offset + 5]);
 
+  // @todo joão, errado aqui, empacotado de 3 em 3 bytes?
+  for (unsigned i = 0; i < dib_header.size_of_data / 4; i++)
+  {
+    unsigned offset = i * 4 + bmp_header.offset;
+    printf("%d: %d %d %d\n", i, file.data[offset + 0], file.data[offset + 1], file.data[offset + 2]);
+  }
+
   return EXIT_SUCCESS;
 }
 
