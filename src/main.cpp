@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
 
 #include "./bitmap.cpp"
 
@@ -127,11 +128,18 @@ int main(int argc, const char* argv[])
   printf("second pixel: blue: %d\n", file.data[bmp_header.offset + 5]);
 
   // @todo joão, errado aqui, empacotado de 3 em 3 bytes?
-  for (unsigned i = 0; i < dib_header.size_of_data / 4; i++)
+  for (unsigned i = 0; i < dib_header.size_of_data / 3; i++)
   {
-    unsigned offset = i * 4 + bmp_header.offset;
-    printf("%d: %d %d %d\n", i, file.data[offset + 0], file.data[offset + 1], file.data[offset + 2]);
+    unsigned offset = bmp_header.offset + i * 3;
+    // printf("%d: %d %d %d\n", i, file.data[offset + 0], file.data[offset + 1], file.data[offset + 2]);
+    file.data[offset + 0] = file.data[offset + 0] / 2;
+    file.data[offset + 1] = file.data[offset + 1] / 2;
+    file.data[offset + 2] = file.data[offset + 2] / 2;
   }
+
+  FILE *out = fopen("../image/image-out.bmp", "wb");
+  fwrite(file.data, 1, file.size, out);
+  fclose(out);
 
   return EXIT_SUCCESS;
 }
