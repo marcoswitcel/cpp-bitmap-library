@@ -128,13 +128,24 @@ int main(int argc, const char* argv[])
   printf("second pixel: blue: %d\n", file.data[bmp_header.offset + 5]);
 
   // @todo joão, errado aqui, empacotado de 3 em 3 bytes?
+  // @note teoricamente seriam 6 bytes úteis e 2 de padding, rows de 4 bytes
+  // primeira pixel no primeiro row, segundo pixel começa no primeiro row e termina ocupando metade do segundo
+  // row, aí entrariam 2 bytes de padding
   for (unsigned i = 0; i < dib_header.size_of_data / 3; i++)
   {
     unsigned offset = bmp_header.offset + i * 3;
     // printf("%d: %d %d %d\n", i, file.data[offset + 0], file.data[offset + 1], file.data[offset + 2]);
-    file.data[offset + 0] = file.data[offset + 0] / 2;
-    file.data[offset + 1] = file.data[offset + 1] / 2;
-    file.data[offset + 2] = file.data[offset + 2] / 2;
+
+    // filtro de luminosidade
+    // file.data[offset + 0] = file.data[offset + 0] / 2;
+    // file.data[offset + 1] = file.data[offset + 1] / 2;
+    // file.data[offset + 2] = file.data[offset + 2] / 2;
+
+    // filtro cinza
+    file.data[offset + 0] = file.data[offset + 1];
+    file.data[offset + 1] = file.data[offset + 1];
+    file.data[offset + 2] = file.data[offset + 1];
+  
   }
 
   FILE *out = fopen("../image/image-out.bmp", "wb");
