@@ -66,4 +66,14 @@ typedef enum Compression_Method {
   BI_CMYKRLE4 = 13,
 } Compression_Method;
 
+/**
+ * @brief Representa um arquivo bitmap
+ * 
+ */
+typedef struct Bitmap_File {
+  Bitmap_File_Header *header;
+  DIB_Header *dib;
+  uint8_t *pixel_array;
+} Bitmap_File;
+
 #endif // __BITMAP_CPP_

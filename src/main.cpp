@@ -76,6 +76,17 @@ Bitmap_File_Header extract_bitmap_file_header_from_byte_array(Byte_Array byte_ar
   return header;
 }
 
+void export_bitmap_file_to_file(Bitmap_File *file, char *filename)
+{
+  FILE *out = fopen(filename, "wb");
+  
+  // @todo João, terminar isso aqui... Falta emitir o pixel_array e ajustar a forma de emitir o DIB Header
+  fwrite(file->header, 1, sizeof(Bitmap_File_Header), out);
+  fwrite(file->dib, 1, sizeof(DIB_Header), out);
+  
+  fclose(out);
+}
+
 int main(int argc, const char* argv[])
 {
   if (argc < 1)
@@ -152,6 +163,18 @@ int main(int argc, const char* argv[])
   FILE *out = fopen("../image/image-out.bmp", "wb");
   fwrite(file.data, 1, file.size, out);
   fclose(out);
+
+  Bitmap_File_Header header;
+  DIB_Header dib;
+  uint8_t pixel_array[6];
+
+  Bitmap_File new_file = {
+    .header = &header,
+    .dib = &dib,
+    .pixel_array = (uint8_t *) &pixel_array,
+  };
+
+  export_bitmap_file_to_file(&new_file, "../image-new.bmp");
 
   return EXIT_SUCCESS;
 }
