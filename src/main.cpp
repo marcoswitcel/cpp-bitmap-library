@@ -174,7 +174,7 @@ int main(int argc, const char* argv[])
     .pixel_array = (uint8_t *) &pixel_array,
   };
 
-  export_bitmap_file_to_file(&new_file, "../image-new.bmp");
+  export_bitmap_file_to_file(&new_file, "../image/image-new.bmp");
 
   return EXIT_SUCCESS;
 }
