@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "./bitmap.cpp"
-#include "./array.cpp"
+#include "./array.h"
 
 using Byte_Array = Array<uint8_t>;
 
@@ -164,12 +164,12 @@ int main(int argc, const char* argv[])
 
   Bitmap_File_Header header;
   DIB_Header dib;
-  uint8_t pixel_array[6];
+  Byte_Array pixel_array;
 
   Bitmap_File new_file = {
     .header = &header,
     .dib = &dib,
-    .pixel_array = (uint8_t *) &pixel_array,
+    .pixel_array = &pixel_array,
   };
 
   export_bitmap_file_to_file(&new_file, "../image/image-new.bmp");
