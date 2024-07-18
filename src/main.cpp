@@ -4,11 +4,9 @@
 #include <stdio.h>
 
 #include "./bitmap.cpp"
+#include "./array.cpp"
 
-typedef struct Byte_Array {
-  uint8_t *data;
-  size_t size;
-} Byte_Array;
+using Byte_Array = Array<uint8_t>;
 
 Byte_Array read_file_as_byte_array(const char *file_path)
 {
@@ -27,31 +25,31 @@ Byte_Array read_file_as_byte_array(const char *file_path)
   fclose(fd);
 
   Byte_Array array = {
+    .length = file_size, 
     .data = buffer,
-    .size = file_size, 
   };
 
   return array;
 }
 
-DIB_Header extract_dib_file_header_from_byte_array(Byte_Array byte_array)
+DIB_Header extract_dib_file_header_from_byte_array(Byte_Array array)
 {
   const unsigned dib_header_offset = BITMAP_FILE_HEADER_SIZE;
   DIB_Header dib;
 
-  dib.size = *((uint32_t*) &byte_array.data[dib_header_offset]);
-  dib.image_width = *((uint32_t*) &byte_array.data[dib_header_offset + 4]);
-  dib.image_height = *((uint32_t*) &byte_array.data[dib_header_offset + 8]);
+  dib.size = *((uint32_t*) &array.data[dib_header_offset]);
+  dib.image_width = *((uint32_t*) &array.data[dib_header_offset + 4]);
+  dib.image_height = *((uint32_t*) &array.data[dib_header_offset + 8]);
 
-  dib.number_of_colors_planes = *((uint16_t*) &byte_array.data[dib_header_offset + 12]);
-  dib.n_bit_per_pixel = *((uint16_t*) &byte_array.data[dib_header_offset + 14]);
-  dib.bitfield = *((uint32_t*) &byte_array.data[dib_header_offset + 16]);
+  dib.number_of_colors_planes = *((uint16_t*) &array.data[dib_header_offset + 12]);
+  dib.n_bit_per_pixel = *((uint16_t*) &array.data[dib_header_offset + 14]);
+  dib.bitfield = *((uint32_t*) &array.data[dib_header_offset + 16]);
 
-  dib.size_of_data = *((uint32_t*) &byte_array.data[dib_header_offset + 20]);
-  dib.print_resolution_horizontal = *((uint32_t*) &byte_array.data[dib_header_offset + 24]);
-  dib.print_resolution_vertical = *((uint32_t*) &byte_array.data[dib_header_offset + 28]);
-  dib.n_colors_in_palette = *((uint32_t*) &byte_array.data[dib_header_offset + 32]);
-  dib.important_colors = *((uint32_t*) &byte_array.data[dib_header_offset + 36]);
+  dib.size_of_data = *((uint32_t*) &array.data[dib_header_offset + 20]);
+  dib.print_resolution_horizontal = *((uint32_t*) &array.data[dib_header_offset + 24]);
+  dib.print_resolution_vertical = *((uint32_t*) &array.data[dib_header_offset + 28]);
+  dib.n_colors_in_palette = *((uint32_t*) &array.data[dib_header_offset + 32]);
+  dib.important_colors = *((uint32_t*) &array.data[dib_header_offset + 36]);
 
   return  dib;
 }
@@ -101,7 +99,7 @@ int main(int argc, const char* argv[])
 
   auto file = read_file_as_byte_array(file_path);
 
-  printf("file size: %ld\n", file.size);
+  printf("file size: %ld\n", file.length);
 
   Bitmap_File_Header bmp_header = extract_bitmap_file_header_from_byte_array(file);
   DIB_Header dib_header = extract_dib_file_header_from_byte_array(file);
@@ -161,7 +159,7 @@ int main(int argc, const char* argv[])
   }
 
   FILE *out = fopen("../image/image-out.bmp", "wb");
-  fwrite(file.data, 1, file.size, out);
+  fwrite(file.data, 1, file.length, out);
   fclose(out);
 
   Bitmap_File_Header header;
