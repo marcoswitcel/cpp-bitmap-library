@@ -83,7 +83,13 @@ int main(int argc, const char* argv[])
   fwrite(file.data, 1, file.length, out);
   fclose(out);
 
-  Bitmap_File_Header header;
+  Bitmap_File_Header header = {
+    .header = {'B', 'M'},
+    .size = 0, // @todo a calcular
+    .application_specific = 0,
+    .application_specific2 = 0,
+    .offset = 0, // @todo a calcular
+  };
   DIB_Header dib;
   Byte_Array pixel_array;
 
