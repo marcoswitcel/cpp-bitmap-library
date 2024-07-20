@@ -32,44 +32,44 @@ Byte_Array read_file_as_byte_array(const char *file_path)
   return array;
 }
 
-DIB_Header extract_dib_file_header_from_byte_array(Byte_Array array)
+DIB_Header extract_dib_file_header_from_byte_array(Byte_Array data)
 {
   const unsigned dib_header_offset = BITMAP_FILE_HEADER_SIZE;
   DIB_Header dib;
 
-  dib.size = *((uint32_t*) &array.data[dib_header_offset]);
-  dib.image_width = *((uint32_t*) &array.data[dib_header_offset + 4]);
-  dib.image_height = *((uint32_t*) &array.data[dib_header_offset + 8]);
+  dib.size = *((uint32_t*) &data[dib_header_offset]);
+  dib.image_width = *((uint32_t*) &data[dib_header_offset + 4]);
+  dib.image_height = *((uint32_t*) &data[dib_header_offset + 8]);
 
-  dib.number_of_colors_planes = *((uint16_t*) &array.data[dib_header_offset + 12]);
-  dib.n_bit_per_pixel = *((uint16_t*) &array.data[dib_header_offset + 14]);
-  dib.bitfield = *((uint32_t*) &array.data[dib_header_offset + 16]);
+  dib.number_of_colors_planes = *((uint16_t*) &data[dib_header_offset + 12]);
+  dib.n_bit_per_pixel = *((uint16_t*) &data[dib_header_offset + 14]);
+  dib.bitfield = *((uint32_t*) &data[dib_header_offset + 16]);
 
-  dib.size_of_data = *((uint32_t*) &array.data[dib_header_offset + 20]);
-  dib.print_resolution_horizontal = *((uint32_t*) &array.data[dib_header_offset + 24]);
-  dib.print_resolution_vertical = *((uint32_t*) &array.data[dib_header_offset + 28]);
-  dib.n_colors_in_palette = *((uint32_t*) &array.data[dib_header_offset + 32]);
-  dib.important_colors = *((uint32_t*) &array.data[dib_header_offset + 36]);
+  dib.size_of_data = *((uint32_t*) &data[dib_header_offset + 20]);
+  dib.print_resolution_horizontal = *((uint32_t*) &data[dib_header_offset + 24]);
+  dib.print_resolution_vertical = *((uint32_t*) &data[dib_header_offset + 28]);
+  dib.n_colors_in_palette = *((uint32_t*) &data[dib_header_offset + 32]);
+  dib.important_colors = *((uint32_t*) &data[dib_header_offset + 36]);
 
   return  dib;
 }
 
-Bitmap_File_Header extract_bitmap_file_header_from_byte_array(Byte_Array byte_array)
+Bitmap_File_Header extract_bitmap_file_header_from_byte_array(Byte_Array data)
 {
   Bitmap_File_Header header = {};
 
-  header.header[0] = byte_array.data[0]; // B
-  header.header[1] = byte_array.data[1]; // M
+  header.header[0] = data[0]; // B
+  header.header[1] = data[1]; // M
 
   // @todo João, verificar como fazer para identificação da endianess do sistema para implementar
   // o código necessário para Big Endian
-  header.size = *((uint32_t*) &byte_array.data[2]);
+  header.size = *((uint32_t*) &data[2]);
 
-  header.application_specific = *((uint16_t*) &byte_array.data[6]);
-  header.application_specific2 = *((uint16_t*) &byte_array.data[8]);
+  header.application_specific = *((uint16_t*) &data[6]);
+  header.application_specific2 = *((uint16_t*) &data[8]);
 
   // @todo João, suportart Big Endian
-  header.offset = *((uint32_t*) &byte_array.data[10]);
+  header.offset = *((uint32_t*) &data[10]);
   
   return header;
 }
