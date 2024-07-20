@@ -62,9 +62,9 @@ int main(int argc, const char* argv[])
   // primeira pixel no primeiro row, segundo pixel começa no primeiro row e termina ocupando metade do segundo
   // row, aí entrariam 2 bytes de padding
   assert(dib_header.size_of_data % 4 == 0);
-  for (unsigned i = 0; i < dib_header.size_of_data / 3; i++)
+  for (unsigned i = 0; i < dib_header.size_of_data; i += 3)
   {
-    unsigned offset = bmp_header.offset + i * 3;
+    unsigned offset = bmp_header.offset + i;
     // printf("%d: %d %d %d\n", i, file.data[offset + 0], file.data[offset + 1], file.data[offset + 2]);
 
     // filtro de luminosidade
@@ -76,7 +76,6 @@ int main(int argc, const char* argv[])
     file.data[offset + 0] = file.data[offset + 1];
     file.data[offset + 1] = file.data[offset + 1];
     file.data[offset + 2] = file.data[offset + 1];
-  
   }
 
   FILE *out = fopen("../image/image-out.bmp", "wb");
@@ -85,13 +84,29 @@ int main(int argc, const char* argv[])
 
   Bitmap_File_Header header = {
     .header = {'B', 'M'},
-    .size = 0, // @todo a calcular
+    .size = 70, // @todo como calcular
     .application_specific = 0,
     .application_specific2 = 0,
-    .offset = 0, // @todo a calcular
+    .offset = 54, // @todo como calcular
   };
-  DIB_Header dib;
-  Byte_Array pixel_array;
+  DIB_Header dib = {
+    .size = 40,
+    .image_width = 2,
+    .image_height = 2,
+    .number_of_colors_planes = 1,
+    .n_bit_per_pixel = 24,
+    .bitfield = BI_RGB,
+    .size_of_data = 16,
+    .print_resolution_horizontal = 2835,
+    .print_resolution_vertical = 2835,
+    .n_colors_in_palette = 0,
+    .important_colors = 0,
+  };
+  uint8_t data[] = { 0, 0, 255, 255, 255, 255, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, };
+  Byte_Array pixel_array = {
+    .length = 16,
+    .data = (uint8_t *) &data,
+  };
 
   Bitmap_File new_file = {
     .header = &header,
