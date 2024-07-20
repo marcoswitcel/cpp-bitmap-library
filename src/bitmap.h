@@ -74,4 +74,15 @@ typedef struct Bitmap_File {
   Array<uint8_t> *pixel_array;
 } Bitmap_File;
 
+// definições de cores
+
+/**
+ * @brief O layout é 8 bits para o azul, 8 bits para o verde e 8 bits para o vermelho
+ */
+typedef struct RGB_24bits {
+  uint8_t b;
+  uint8_t g;
+  uint8_t r;
+} RGB_24bits;
+
 #endif // __BITMAP_H_
