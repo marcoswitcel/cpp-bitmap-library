@@ -1,5 +1,4 @@
-#ifndef __BITMAP_CPP_
-#define __BITMAP_CPP_
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -93,5 +92,3 @@ void export_bitmap_file_to_file(Bitmap_File *file, const char *filename)
   
   fclose(out);
 }
-
-#endif // __BITMAP_CPP_

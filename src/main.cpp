@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "./bitmap.cpp"
-#include "./array.h"
+#include "./array.hpp"
 
 void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Array<uint8_t> &file)
 {

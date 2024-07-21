@@ -1,7 +1,7 @@
 #ifndef __BITMAP_H_
 #define __BITMAP_H_
 
-#include "./array.h"
+#include "./array.hpp"
 
 typedef struct Bitmap {
   unsigned width;
