@@ -51,15 +51,22 @@ void filter_RGB_24bits_luminosity(const RGB_24bits *in, RGB_24bits *out)
 
 void iterate_over_uncompressed_data(Bitmap_File *file, Filter_RGB_24bits func)
 {
+  assert(file->dib->bitfield == BI_RGB);
+  if (file->dib->bitfield != BI_RGB)
+  {
+    printf("iterate_over_uncompressed_data chamado para um arquivo comprimido\n");
+    return;
+  }
+
   const unsigned row_size_in_bytes = ((file->dib->n_bit_per_pixel * file->dib->image_width + 31) / 32) * 4;
   
   for (unsigned row = 0; row < file->dib->image_height; row++)
   {
-    const unsigned offset = file->header->offset + row * row_size_in_bytes;
+    const unsigned offset =  row * row_size_in_bytes;
 
     for (unsigned col = 0; col < file->dib->image_width; col++)
     {
-      RGB_24bits *pixel = (RGB_24bits *) &file->pixel_array[offset + col * 3];
+      RGB_24bits *pixel = (RGB_24bits *) &file->pixel_array->data[offset + col * 3];
       func(pixel, pixel);
     }
   }
@@ -87,6 +94,8 @@ int main(int argc, const char* argv[])
     .length = dib_header.size_of_data,
     .data = &file[bmp_header.offset],
   };
+  assert(&file.data[bmp_header.offset] == file_pixel_array.data);
+  assert(file_pixel_array.length == (file.length - bmp_header.offset));
   Bitmap_File bitmap_file = {
     .header = &bmp_header,
     .dib = &dib_header,
