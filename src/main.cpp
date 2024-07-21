@@ -112,7 +112,6 @@ int main(int argc, const char* argv[])
 
   debug_print_info(bmp_header, dib_header, file);
 
-  // @todo joão, errado aqui, empacotado de 3 em 3 bytes?
   // @note teoricamente seriam 6 bytes úteis e 2 de padding, rows de 4 bytes
   // primeira pixel no primeiro row, segundo pixel começa no primeiro row e termina ocupando metade do segundo
   // row, aí entrariam 2 bytes de padding

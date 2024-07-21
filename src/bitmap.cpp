@@ -79,12 +79,14 @@ void export_bitmap_file_to_file(Bitmap_File *file, const char *filename)
 {
   FILE *out = fopen(filename, "wb");
   
+  // @todo João, lento isso aqui... porém por hora está bom
   fwrite(&file->header->header, 1, sizeof(Bitmap_File_Header::header), out);
   fwrite(&file->header->size, 1, sizeof(Bitmap_File_Header::size), out);
   fwrite(&file->header->application_specific, 1, sizeof(Bitmap_File_Header::application_specific), out);
   fwrite(&file->header->application_specific2, 1, sizeof(Bitmap_File_Header::application_specific2), out);
   fwrite(&file->header->offset, 1, sizeof(Bitmap_File_Header::offset), out);
 
+  // @note Pode quebrar dependendo do padding, ajustar no futuro
   fwrite(file->dib, 1, sizeof(DIB_Header), out);
 
   fwrite(file->pixel_array->data, 1, file->pixel_array->length, out);
