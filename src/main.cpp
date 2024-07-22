@@ -118,16 +118,8 @@ void export_sample_01_2x2_image()
   export_bitmap_file_to_file(&new_file, filename.c_str());
 }
 
-int main(int argc, const char* argv[])
+void load_and_mofidy(const char *file_path)
 {
-  if (argc < 1)
-  {
-    std::cout << "Nome do arquivo faltando.\n";
-    return EXIT_FAILURE;
-  }
-
-  const char *file_path = argv[1];
-
   printf("file path: %s\n", file_path);
 
   auto file = read_file_as_byte_array(file_path);
@@ -168,6 +160,19 @@ int main(int argc, const char* argv[])
   FILE *out = fopen("../image/image-out.bmp", "wb");
   fwrite(file.data, 1, file.length, out);
   fclose(out);
+}
+
+int main(int argc, const char* argv[])
+{
+  if (argc < 1)
+  {
+    std::cout << "Nome do arquivo faltando.\n";
+    return EXIT_FAILURE;
+  }
+
+  const char *file_path = argv[1];
+
+  load_and_mofidy(file_path);
 
   export_sample_01_2x2_image();
 
