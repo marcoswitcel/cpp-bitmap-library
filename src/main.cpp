@@ -118,6 +118,87 @@ void export_sample_01_2x2_image()
   export_bitmap_file_to_file(&new_file, filename.c_str());
 }
 
+Bitmap_File make_bitmap_from_image_data(const unsigned width, const unsigned height, Array<RGB_24bits> &image)
+{
+  Bitmap_File_Header *header = new Bitmap_File_Header;
+  header->header[0] = 'B';
+  header->header[1] = 'M';
+  header->size = 70; // @todo aqui
+  header->application_specific = 0;
+  header->application_specific2 = 0;
+  header->offset = 54; // @todo aqui
+
+  DIB_Header *dib = new DIB_Header;
+  dib->size = 40; // @todo aqui
+  dib->image_width = 2;
+  dib->image_height = 2;
+  dib->number_of_colors_planes = 1;
+  dib->n_bit_per_pixel = 24;
+  dib->bitfield = BI_RGB;
+  dib->size_of_data = 16;
+  dib->print_resolution_horizontal = 2835;
+  dib->print_resolution_vertical = 2835;
+  dib->n_colors_in_palette = 0;
+  dib->important_colors = 0;
+
+  
+  uint8_t *data = new uint8_t[16];
+  data[0] = 0;
+  data[1] = 0;
+  data[2] = 255;
+  data[3] = 255;
+  data[4] = 255;
+  data[5] = 255;
+  data[6] = 0;
+  data[7] = 0;
+  data[8] = 255;
+  data[9] = 0;
+  data[10] = 0;
+  data[11] = 0;
+  data[12] = 255;
+  data[13] = 0;
+  data[14] = 0;
+  data[15] = 0;
+
+
+  Byte_Array *pixel_array = new Byte_Array;
+  pixel_array->length = 16;
+  pixel_array->data = data;
+
+  Bitmap_File new_file = {
+    .header = header,
+    .dib = dib,
+    .pixel_array = pixel_array,
+  };
+
+  return new_file;
+}
+
+void export_generated_image()
+{
+  const unsigned width = 1920;
+  const unsigned height = 1080;
+
+  Array<RGB_24bits> image = {
+    .length = width * height,
+    .data = new RGB_24bits[width * height],
+  };
+
+  for (size_t i = 0; i < image.length; i++)
+  {
+    auto &pixel = image[i];
+    pixel.r = ((i % width) / 100.0f) * 255;
+    pixel.g = 0;
+    pixel.b = ((i / width) / ((float) height)) * 255;
+  }
+
+  std::string filename = "../image/image-generated.bmp";
+
+  Bitmap_File new_file = make_bitmap_from_image_data(width, height, image);
+
+  export_bitmap_file_to_file(&new_file, filename.c_str());
+}
+
 void load_and_mofidy(const char *file_path)
 {
   printf("file path: %s\n", file_path);
@@ -175,6 +256,8 @@ int main(int argc, const char* argv[])
   load_and_mofidy(file_path);
 
   export_sample_01_2x2_image();
+
+  export_generated_image();
 
   return EXIT_SUCCESS;
 }
