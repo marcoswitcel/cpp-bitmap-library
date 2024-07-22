@@ -49,6 +49,13 @@ void filter_RGB_24bits_luminosity(const RGB_24bits *in, RGB_24bits *out)
   out->r = in->r / 2;
 }
 
+void filter_RGB_24bits_blue(const RGB_24bits *in, RGB_24bits *out)
+{
+  out->b = 255;
+  out->g = 0;
+  out->r = 0;
+}
+
 void iterate_over_uncompressed_data(Bitmap_File *file, Filter_RGB_24bits func)
 {
   assert(file->dib->bitfield == BI_RGB);
@@ -120,56 +127,41 @@ void export_sample_01_2x2_image()
 
 Bitmap_File make_bitmap_from_image_data(const unsigned width, const unsigned height, Array<RGB_24bits> &image)
 {
+  const size_t pixel_storage_needed_in_bytes = calculate_pixel_storage(24, width, height);
+
   Bitmap_File_Header *header = new Bitmap_File_Header;
   header->header[0] = 'B';
   header->header[1] = 'M';
-  header->size = 70; // @todo aqui
+  header->size = BITMAP_DIB_HEADER_SIZE + BITMAP_FILE_HEADER_SIZE + pixel_storage_needed_in_bytes; // @todo aqui
   header->application_specific = 0;
   header->application_specific2 = 0;
-  header->offset = 54; // @todo aqui
+  header->offset = BITMAP_DIB_HEADER_SIZE + BITMAP_FILE_HEADER_SIZE; // soma do header mais o dib header
 
   DIB_Header *dib = new DIB_Header;
-  dib->size = 40; // @todo aqui
-  dib->image_width = 2;
-  dib->image_height = 2;
+  dib->size = BITMAP_DIB_HEADER_SIZE; // esse DIB Header tem tamanho de 40 bytes
+  dib->image_width = width;
+  dib->image_height = height;
   dib->number_of_colors_planes = 1;
   dib->n_bit_per_pixel = 24;
   dib->bitfield = BI_RGB;
-  dib->size_of_data = 16;
+  dib->size_of_data = pixel_storage_needed_in_bytes;
   dib->print_resolution_horizontal = 2835;
   dib->print_resolution_vertical = 2835;
   dib->n_colors_in_palette = 0;
   dib->important_colors = 0;
 
   
-  uint8_t *data = new uint8_t[16];
-  data[0] = 0;
-  data[1] = 0;
-  data[2] = 255;
-  data[3] = 255;
-  data[4] = 255;
-  data[5] = 255;
-  data[6] = 0;
-  data[7] = 0;
-  data[8] = 255;
-  data[9] = 0;
-  data[10] = 0;
-  data[11] = 0;
-  data[12] = 255;
-  data[13] = 0;
-  data[14] = 0;
-  data[15] = 0;
-
-
   Byte_Array *pixel_array = new Byte_Array;
-  pixel_array->length = 16;
-  pixel_array->data = data;
+  pixel_array->length = pixel_storage_needed_in_bytes;
+  pixel_array->data = new uint8_t[pixel_storage_needed_in_bytes];
 
   Bitmap_File new_file = {
     .header = header,
     .dib = dib,
     .pixel_array = pixel_array,
   };
+
+  iterate_over_uncompressed_data(&new_file, filter_RGB_24bits_blue);
 
   return new_file;
 }

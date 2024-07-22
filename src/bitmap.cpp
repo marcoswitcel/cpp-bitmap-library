@@ -92,3 +92,13 @@ void export_bitmap_file_to_file(Bitmap_File *file, const char *filename)
   
   fclose(out);
 }
+
+static inline auto calculate_row_size(uint8_t n_bit_per_pixel, size_t image_width)
+{
+  return ((n_bit_per_pixel * image_width + 31) / 32) * 4;
+}
+
+static inline auto calculate_pixel_storage(uint8_t n_bit_per_pixel, size_t image_width, size_t image_height)
+{
+  return calculate_row_size(n_bit_per_pixel, image_width) * image_height;
+}
