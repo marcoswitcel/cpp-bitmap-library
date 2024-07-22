@@ -72,6 +72,52 @@ void iterate_over_uncompressed_data(Bitmap_File *file, Filter_RGB_24bits func)
   }
 }
 
+/**
+ * @brief imagem de exemplo 1 da wikipedia, implementada aqui para testar a 
+ * capacidade de gerar arquivos válidos usando o código escrito.
+ * 
+ * @url https://en.wikipedia.org/wiki/BMP_file_format#Example_1
+ */
+void export_sample_01_2x2_image()
+{
+  Bitmap_File_Header header = {
+    .header = {'B', 'M'},
+    .size = 70,
+    .application_specific = 0,
+    .application_specific2 = 0,
+    .offset = 54,
+  };
+
+  DIB_Header dib = {
+    .size = 40,
+    .image_width = 2,
+    .image_height = 2,
+    .number_of_colors_planes = 1,
+    .n_bit_per_pixel = 24,
+    .bitfield = BI_RGB,
+    .size_of_data = 16,
+    .print_resolution_horizontal = 2835,
+    .print_resolution_vertical = 2835,
+    .n_colors_in_palette = 0,
+    .important_colors = 0,
+  };
+
+  uint8_t data[] = { 0, 0, 255, 255, 255, 255, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, };
+  Byte_Array pixel_array = {
+    .length = 16,
+    .data = (uint8_t *) &data,
+  };
+
+  Bitmap_File new_file = {
+    .header = &header,
+    .dib = &dib,
+    .pixel_array = &pixel_array,
+  };
+
+  std::string filename = "../image/image-new.bmp";
+  export_bitmap_file_to_file(&new_file, filename.c_str());
+}
+
 int main(int argc, const char* argv[])
 {
   if (argc < 1)
@@ -123,39 +169,7 @@ int main(int argc, const char* argv[])
   fwrite(file.data, 1, file.length, out);
   fclose(out);
 
-  Bitmap_File_Header header = {
-    .header = {'B', 'M'},
-    .size = 70, // @todo como calcular
-    .application_specific = 0,
-    .application_specific2 = 0,
-    .offset = 54, // @todo como calcular
-  };
-  DIB_Header dib = {
-    .size = 40,
-    .image_width = 2,
-    .image_height = 2,
-    .number_of_colors_planes = 1,
-    .n_bit_per_pixel = 24,
-    .bitfield = BI_RGB,
-    .size_of_data = 16,
-    .print_resolution_horizontal = 2835,
-    .print_resolution_vertical = 2835,
-    .n_colors_in_palette = 0,
-    .important_colors = 0,
-  };
-  uint8_t data[] = { 0, 0, 255, 255, 255, 255, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, };
-  Byte_Array pixel_array = {
-    .length = 16,
-    .data = (uint8_t *) &data,
-  };
-
-  Bitmap_File new_file = {
-    .header = &header,
-    .dib = &dib,
-    .pixel_array = &pixel_array,
-  };
-
-  export_bitmap_file_to_file(&new_file, "../image/image-new.bmp");
+  export_sample_01_2x2_image();
 
   return EXIT_SUCCESS;
 }
