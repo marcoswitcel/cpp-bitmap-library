@@ -250,13 +250,21 @@ void load_and_mofidy(const char *file_path)
 
 int main(int argc, const char* argv[])
 {
-  if (argc < 1)
+  if (argc < 3)
   {
     std::cout << "Nome do arquivo faltando.\n";
     return EXIT_FAILURE;
   }
 
-  const char *file_path = argv[1];
+  std::string arg1 = "--filename";
+
+  if (arg1.compare(argv[1]) != 0)
+  {
+    std::cout << "Argumento não suportado.\n";
+    return EXIT_FAILURE;
+  }
+
+  const char *file_path = argv[2];
 
   load_and_mofidy(file_path);
 

@@ -8,6 +8,13 @@
 
 using Byte_Array = Array<uint8_t>;
 
+/**
+ * @brief 
+ * @note Implementar um retorno de sucesso ou falha, não sair do programa nessa rotina 
+ * 
+ * @param file_path 
+ * @return Byte_Array 
+ */
 Byte_Array read_file_as_byte_array(const char *file_path)
 {
   FILE *fd = fopen(file_path, "rb");
