@@ -1,7 +1,7 @@
 # Configurações de compilação
 ## usando g++ não precisa do parâmetro -lstdc++
 CC = g++
-CFLAGS = -Wall -Wextra -pedantic -std=c++2a
+CFLAGS = -Wall -Wextra -pedantic -std=c++2a # -fsanitize=address -g
 LFLAGS = -lSDL2 -lSDL2_ttf
 DEF = -DDEV_CODE_ENABLED
 
@@ -17,7 +17,7 @@ main: build-folder-setup ./$(SOURCE_FOLDER_NAME)/main.cpp
 
 run: main
 	@echo "cd ./$(BUILD_FOLDER_NAME)"
-	@echo ./main
+	@echo ./main $(ARGS)
 	@echo "================"
-	@cd ./$(BUILD_FOLDER_NAME) && ./main
+	@cd ./$(BUILD_FOLDER_NAME) && ./main $(ARGS)
 	@echo "\n================\n"
