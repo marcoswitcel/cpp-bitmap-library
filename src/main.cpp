@@ -161,7 +161,20 @@ Bitmap_File make_bitmap_from_image_data(const unsigned width, const unsigned hei
     .pixel_array = pixel_array,
   };
 
-  iterate_over_uncompressed_data(&new_file, filter_RGB_24bits_blue);
+  assert(new_file.dib->bitfield == BI_RGB);
+
+  const unsigned row_size_in_bytes = ((new_file.dib->n_bit_per_pixel * new_file.dib->image_width + 31) / 32) * 4;
+  
+  for (unsigned row = 0; row < new_file.dib->image_height; row++)
+  {
+    const unsigned offset =  row * row_size_in_bytes;
+
+    for (unsigned col = 0; col < new_file.dib->image_width; col++)
+    {
+      RGB_24bits *pixel = (RGB_24bits *) &new_file.pixel_array->data[offset + col * 3];
+      *pixel = image.data[(height - 1 - row) * width + col];
+    }
+  }
 
   return new_file;
 }
@@ -179,7 +192,7 @@ void export_generated_image()
   for (size_t i = 0; i < image.length; i++)
   {
     auto &pixel = image[i];
-    pixel.r = ((i % width) / 100.0f) * 255;
+    pixel.r = ((i % width) / ((float) width)) * 255;
     pixel.g = 0;
     pixel.b = ((i / width) / ((float) height)) * 255;
   }
