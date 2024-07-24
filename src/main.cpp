@@ -316,15 +316,9 @@ int main(int argc, const char* argv[])
     return EXIT_FAILURE;
   }
 
-  arguments.file_in = argv[file_in_index + 1];
   // @todo João, avisar se for o mesmo arquivo
+  arguments.file_in = argv[file_in_index + 1];
   arguments.file_out = argv[file_out_index + 1];
-
-  if (argc < 5)
-  {
-    std::cout << "Faltando nome de saída.\n";
-    return EXIT_FAILURE;
-  }
 
   load_and_mofidy(arguments.file_in, arguments.file_out);
 
