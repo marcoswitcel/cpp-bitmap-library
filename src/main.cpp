@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 #include <stdio.h>
 
 #include "./bitmap.cpp"
@@ -204,7 +205,19 @@ void export_generated_image()
   export_bitmap_file_to_file(&new_file, filename.c_str());
 }
 
-void load_and_mofidy(const char *file_path)
+bool is_string_present_in_argv(const char *switch_name, int argc, const char *argv[])
+{
+  for (int i = 0; i < argc; i++)
+  {
+    if (!strcmp(argv[i], switch_name))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+void load_and_mofidy(const char *file_path, const char *file_out_path)
 {
   printf("file path: %s\n", file_path);
 
@@ -243,20 +256,23 @@ void load_and_mofidy(const char *file_path)
   iterate_over_uncompressed_data(&bitmap_file, filter_RGB_24bits_luminosity);
 
 
-  FILE *out = fopen("../image/image-out.bmp", "wb");
+  FILE *out = fopen(file_out_path, "wb");
   fwrite(file.data, 1, file.length, out);
   fclose(out);
 }
 
 int main(int argc, const char* argv[])
 {
+  const bool is_generated_image = is_string_present_in_argv("--generate-image", argc, argv);
+  const bool is_export_sample = is_string_present_in_argv("--export-sample", argc, argv);
+
   if (argc < 3)
   {
     std::cout << "Nome do arquivo faltando.\n";
     return EXIT_FAILURE;
   }
 
-  std::string arg1 = "--filename";
+  std::string arg1 = "--file-in";
 
   if (arg1.compare(argv[1]) != 0)
   {
@@ -265,12 +281,20 @@ int main(int argc, const char* argv[])
   }
 
   const char *file_path = argv[2];
+  // @todo João, avisar se for o mesmo arquivo
+  const char *file_out_path = argv[4];
 
-  load_and_mofidy(file_path);
+  if (argc < 5)
+  {
+    std::cout << "Faltando nome de saída.\n";
+    return EXIT_FAILURE;
+  }
 
-  export_sample_01_2x2_image();
+  load_and_mofidy(file_path, file_out_path);
 
-  export_generated_image();
+  if (is_export_sample) export_sample_01_2x2_image();
+
+  if (is_generated_image) export_generated_image();
 
   return EXIT_SUCCESS;
 }
