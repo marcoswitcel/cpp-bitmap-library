@@ -205,6 +205,18 @@ void export_generated_image()
   export_bitmap_file_to_file(&new_file, filename.c_str());
 }
 
+int index_of_in_argv(const char *argument, int argc, const char *argv[])
+{
+  for (int i = 0; i < argc; i++)
+  {
+    if (!strcmp(argv[i], argument))
+    {
+      return i;
+    }
+  }
+  return -1;
+}
+
 bool is_string_present_in_argv(const char *switch_name, int argc, const char *argv[])
 {
   for (int i = 0; i < argc; i++)
@@ -277,23 +289,36 @@ int main(int argc, const char* argv[])
     .file_out = NULL,
   };
 
-  if (argc < 3)
+  int file_in_index = index_of_in_argv("--file-in", argc, argv);
+  int file_out_index = index_of_in_argv("--file-out", argc, argv);
+  
+  if (file_in_index < 0)
   {
-    std::cout << "Nome do arquivo faltando.\n";
+    std::cout << "Parâmetro com o nome do arquivo de entrada faltando.\n";
     return EXIT_FAILURE;
   }
 
-  std::string arg1 = "--file-in";
-
-  if (arg1.compare(argv[1]) != 0)
+  if (file_in_index + 1 >= argc)
   {
-    std::cout << "Argumento não suportado.\n";
+    std::cout << "Valor do arquivo de entrada faltando.\n";
     return EXIT_FAILURE;
   }
 
-  arguments.file_in = argv[2];
+  if (file_out_index < 0)
+  {
+    std::cout << "Parâmetro com o nome do arquivo de saída faltando.\n";
+    return EXIT_FAILURE;
+  }
+
+  if (file_out_index + 1 >= argc)
+  {
+    std::cout << "Valor do arquivo de saída faltando.\n";
+    return EXIT_FAILURE;
+  }
+
+  arguments.file_in = argv[file_in_index + 1];
   // @todo João, avisar se for o mesmo arquivo
-  arguments.file_out = argv[4];
+  arguments.file_out = argv[file_out_index + 1];
 
   if (argc < 5)
   {
