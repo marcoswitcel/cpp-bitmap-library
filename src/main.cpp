@@ -261,10 +261,21 @@ void load_and_mofidy(const char *file_path, const char *file_out_path)
   fclose(out);
 }
 
+typedef struct Command_Line_Arguments {
+  bool is_generated_image;
+  bool is_export_sample;
+  const char *file_in;
+  const char *file_out;
+} Command_Line_Arguments;
+
 int main(int argc, const char* argv[])
 {
-  const bool is_generated_image = is_string_present_in_argv("--generate-image", argc, argv);
-  const bool is_export_sample = is_string_present_in_argv("--export-sample", argc, argv);
+  Command_Line_Arguments arguments = {
+    .is_generated_image = is_string_present_in_argv("--generate-image", argc, argv),
+    .is_export_sample = is_string_present_in_argv("--export-sample", argc, argv),
+    .file_in = NULL,
+    .file_out = NULL,
+  };
 
   if (argc < 3)
   {
@@ -280,9 +291,9 @@ int main(int argc, const char* argv[])
     return EXIT_FAILURE;
   }
 
-  const char *file_path = argv[2];
+  arguments.file_in = argv[2];
   // @todo João, avisar se for o mesmo arquivo
-  const char *file_out_path = argv[4];
+  arguments.file_out = argv[4];
 
   if (argc < 5)
   {
@@ -290,11 +301,11 @@ int main(int argc, const char* argv[])
     return EXIT_FAILURE;
   }
 
-  load_and_mofidy(file_path, file_out_path);
+  load_and_mofidy(arguments.file_in, arguments.file_out);
 
-  if (is_export_sample) export_sample_01_2x2_image();
+  if (arguments.is_export_sample) export_sample_01_2x2_image();
 
-  if (is_generated_image) export_generated_image();
+  if (arguments.is_generated_image) export_generated_image();
 
   return EXIT_SUCCESS;
 }
