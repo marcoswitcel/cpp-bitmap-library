@@ -229,13 +229,13 @@ bool is_string_present_in_argv(const char *switch_name, int argc, const char *ar
   return false;
 }
 
-void load_and_mofidy(const char *file_path, const char *file_out_path)
+void load_and_mofidy(const char *file_path, const char *file_out_path, bool emmit_header_info)
 {
-  printf("file path: %s\n", file_path);
+  if (emmit_header_info) printf("file path: %s\n", file_path);
 
   auto file = read_file_as_byte_array(file_path);
 
-  printf("file size: %ld\n", file.length);
+  if (emmit_header_info) printf("file size: %ld\n", file.length);
 
   Bitmap_File_Header bmp_header = extract_bitmap_file_header_from_byte_array(file);
   DIB_Header dib_header = extract_dib_file_header_from_byte_array(file);
@@ -259,7 +259,7 @@ void load_and_mofidy(const char *file_path, const char *file_out_path)
   assert((BITMAP_FILE_HEADER_SIZE + dib_header.size) == bmp_header.offset);
   assert((BITMAP_FILE_HEADER_SIZE + dib_header.size + dib_header.size_of_data) == bmp_header.size);
 
-  debug_print_info(bmp_header, dib_header, file);
+  if (emmit_header_info) debug_print_info(bmp_header, dib_header, file);
 
   // @note teoricamente seriam 6 bytes úteis e 2 de padding, rows de 4 bytes
   // primeira pixel no primeiro row, segundo pixel começa no primeiro row e termina ocupando metade do segundo
@@ -273,11 +273,36 @@ void load_and_mofidy(const char *file_path, const char *file_out_path)
   fclose(out);
 }
 
+void load_and_size_down(const char *file_path, const char *file_out_path)
+{
+  auto file = read_file_as_byte_array(file_path);
+
+  Bitmap_File_Header bmp_header = extract_bitmap_file_header_from_byte_array(file);
+  DIB_Header dib_header = extract_dib_file_header_from_byte_array(file);
+  Array<uint8_t> file_pixel_array = {
+    .length = dib_header.size_of_data,
+    .data = &file[bmp_header.offset],
+  };
+  assert(&file.data[bmp_header.offset] == file_pixel_array.data);
+  assert(file_pixel_array.length == (file.length - bmp_header.offset));
+  Bitmap_File bitmap_file = {
+    .header = &bmp_header,
+    .dib = &dib_header,
+    .pixel_array = &file_pixel_array,
+  };
+
+  FILE *out = fopen(file_out_path, "wb");
+  fwrite(file.data, 1, file.length, out);
+  fclose(out);
+}
+
 typedef struct Command_Line_Arguments {
   bool is_generated_image;
   bool is_export_sample;
   const char *file_in;
   const char *file_out;
+  bool emmit_header_info;
+  bool size_down;
 } Command_Line_Arguments;
 
 int main(int argc, const char* argv[])
@@ -287,6 +312,8 @@ int main(int argc, const char* argv[])
     .is_export_sample = is_string_present_in_argv("--export-sample", argc, argv),
     .file_in = NULL,
     .file_out = NULL,
+    .emmit_header_info = is_string_present_in_argv("--header-info", argc, argv),
+    .size_down = is_string_present_in_argv("--size-down", argc, argv),
   };
 
   int file_in_index = index_of_in_argv("--file-in", argc, argv);
@@ -320,7 +347,10 @@ int main(int argc, const char* argv[])
   arguments.file_in = argv[file_in_index + 1];
   arguments.file_out = argv[file_out_index + 1];
 
-  load_and_mofidy(arguments.file_in, arguments.file_out);
+  load_and_mofidy(arguments.file_in, arguments.file_out, arguments.emmit_header_info);
+
+  // @todo João, WIP: terminar o size_down e mudar o nome do arquivo de saída
+  // if (arguments.size_down) load_and_size_down(arguments.file_in, arguments.file_out);
 
   if (arguments.is_export_sample) export_sample_01_2x2_image();
 
