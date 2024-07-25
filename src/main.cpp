@@ -317,7 +317,8 @@ void load_and_size_down(const char *file_path, const char *file_out_path)
   texture.data[0].b = 0;
   texture.data[1].b = 0;
 
-  auto new_file = make_bitmap_from_image_data(dib_header.image_width, dib_header.image_height, texture);
+  // @todo João, por hora só cortei a resolução, mas preciso criar uma textura a partir da textura base
+  auto new_file = make_bitmap_from_image_data(dib_header.image_width / 2, dib_header.image_height / 2, texture);
   
   // @todo João, WIP: terminar o size_down e mudar o nome do arquivo de saída
   // FILE *out = fopen(file_out_path, "wb");
