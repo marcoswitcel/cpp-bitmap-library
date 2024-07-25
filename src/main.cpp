@@ -308,12 +308,20 @@ void load_and_size_down(const char *file_path, const char *file_out_path)
       texture.data[(dib_header.image_height - 1 - row) * dib_header.image_width + col] = *pixel;
     }
   }
+
+  // dois pixeis alterados na lateral superior esquerda
+  texture.data[0].r = 0;
+  texture.data[1].r = 0;
+  texture.data[0].g = 0;
+  texture.data[1].g = 0;
+  texture.data[0].b = 0;
+  texture.data[1].b = 0;
+
+  auto new_file = make_bitmap_from_image_data(dib_header.image_width, dib_header.image_height, texture);
   
   // @todo João, WIP: terminar o size_down e mudar o nome do arquivo de saída
   // FILE *out = fopen(file_out_path, "wb");
-  FILE *out = fopen("../image/sized-down.bmp", "wb");
-  fwrite(file.data, 1, file.length, out);
-  fclose(out);
+  export_bitmap_file_to_file(&new_file, "../image/sized-down.bmp");
 }
 
 typedef struct Command_Line_Arguments {
