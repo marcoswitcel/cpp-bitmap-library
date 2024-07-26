@@ -273,6 +273,29 @@ void load_and_mofidy(const char *file_path, const char *file_out_path, bool emmi
   fclose(out);
 }
 
+Array<RGB_24bits>* make_contiguous_array_out_of_pixel_storage(Bitmap_File &bitmap_file)
+{
+  Array<RGB_24bits> *texture = new Array<RGB_24bits>;
+  
+  texture->length = bitmap_file.dib->image_width * bitmap_file.dib->image_height;
+  texture->data = new RGB_24bits[bitmap_file.dib->image_width * bitmap_file.dib->image_height];
+
+  const unsigned row_size_in_bytes = ((bitmap_file.dib->n_bit_per_pixel * bitmap_file.dib->image_width + 31) / 32) * 4;
+  
+  for (unsigned row = 0; row < bitmap_file.dib->image_height; row++)
+  {
+    const unsigned offset =  row * row_size_in_bytes;
+
+    for (unsigned col = 0; col < bitmap_file.dib->image_width; col++)
+    {
+      RGB_24bits *pixel = (RGB_24bits *) &bitmap_file.pixel_array->data[offset + col * 3];
+      texture->data[(bitmap_file.dib->image_height - 1 - row) * bitmap_file.dib->image_width + col] = *pixel;
+    }
+  }
+
+  return texture;
+}
+
 void load_and_size_down(const char *file_path, const char *file_out_path)
 {
   auto file = read_file_as_byte_array(file_path);
@@ -291,23 +314,7 @@ void load_and_size_down(const char *file_path, const char *file_out_path)
     .pixel_array = &file_pixel_array,
   };
 
-  Array<RGB_24bits> texture = {
-    .length = dib_header.image_width * dib_header.image_height,
-    .data = new RGB_24bits[dib_header.image_width * dib_header.image_height],
-  };
-
-  const unsigned row_size_in_bytes = ((bitmap_file.dib->n_bit_per_pixel * bitmap_file.dib->image_width + 31) / 32) * 4;
-  
-  for (unsigned row = 0; row < bitmap_file.dib->image_height; row++)
-  {
-    const unsigned offset =  row * row_size_in_bytes;
-
-    for (unsigned col = 0; col < bitmap_file.dib->image_width; col++)
-    {
-      RGB_24bits *pixel = (RGB_24bits *) &bitmap_file.pixel_array->data[offset + col * 3];
-      texture.data[(dib_header.image_height - 1 - row) * dib_header.image_width + col] = *pixel;
-    }
-  }
+  Array<RGB_24bits> &texture = *make_contiguous_array_out_of_pixel_storage(bitmap_file);
 
   // dois pixeis alterados na lateral superior esquerda
   texture.data[0].r = 0;
@@ -317,8 +324,15 @@ void load_and_size_down(const char *file_path, const char *file_out_path)
   texture.data[0].b = 0;
   texture.data[1].b = 0;
 
+  const unsigned new_width = dib_header.image_width / 2;
+  const unsigned new_height = dib_header.image_height / 2;
+  Array<RGB_24bits> new_texture = {
+    .length = new_width * new_height,
+    .data  = new RGB_24bits[new_width * new_height],
+  };
+
   // @todo João, por hora só cortei a resolução, mas preciso criar uma textura a partir da textura base
-  auto new_file = make_bitmap_from_image_data(dib_header.image_width / 2, dib_header.image_height / 2, texture);
+  auto new_file = make_bitmap_from_image_data(new_width, new_height, new_texture);
   
   // @todo João, WIP: terminar o size_down e mudar o nome do arquivo de saída
   // FILE *out = fopen(file_out_path, "wb");
