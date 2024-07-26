@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "./bitmap.cpp"
 #include "./array.hpp"
@@ -297,6 +298,40 @@ Array<RGB_24bits>* make_contiguous_array_out_of_pixel_storage(Bitmap_File &bitma
   return texture;
 }
 
+
+static inline RGB_24bits lerp(RGB_24bits v0, RGB_24bits v1, float percent)
+{
+  return RGB_24bits {
+    .b = (uint8_t) (v0.b + ((v1.b - v0.b) * percent)),
+    .g = (uint8_t) (v0.g + ((v1.g - v0.g) * percent)),
+    .r = (uint8_t) (v0.r + ((v1.r - v0.r) * percent)),
+  };
+}
+
+RGB_24bits sampler2D(Image<RGB_24bits> &texture, float xNormalized, float yNormalized)
+{
+  using namespace std;
+
+  const auto width = texture.width;
+  const auto height = texture.height;
+
+  float x = width * xNormalized;
+  float y = height * yNormalized;
+  float xDecimal = (x - (long) x);
+  float yDecimal = (y - (long) y);
+
+  RGB_24bits c0 = texture.buffer->data[static_cast<size_t>(floor(y) * width + floor(x)) ];
+  RGB_24bits c1 = texture.buffer->data[static_cast<size_t>(floor(y) * width + ceil(x)) ];
+  RGB_24bits c2 = texture.buffer->data[static_cast<size_t>(ceil(y) * width + floor(x)) ];
+  RGB_24bits c3 = texture.buffer->data[static_cast<size_t>(ceil(y) * width + ceil(x)) ];
+
+  RGB_24bits l0 = lerp(c0, c1, xDecimal);
+  RGB_24bits l1 = lerp(c2, c3, xDecimal);
+  RGB_24bits lr = lerp(l0, l1, yDecimal);
+
+  return lr;
+}
+
 void load_and_size_down(const char *file_path, const char *file_out_path)
 {
   auto file = read_file_as_byte_array(file_path);
@@ -318,12 +353,18 @@ void load_and_size_down(const char *file_path, const char *file_out_path)
   Array<RGB_24bits> &texture = *make_contiguous_array_out_of_pixel_storage(bitmap_file);
 
   // dois pixeis alterados na lateral superior esquerda
-  texture.data[0].r = 0;
-  texture.data[1].r = 0;
-  texture.data[0].g = 0;
-  texture.data[1].g = 0;
-  texture.data[0].b = 0;
-  texture.data[1].b = 0;
+  // texture.data[0].r = 0;
+  // texture.data[1].r = 0;
+  // texture.data[0].g = 0;
+  // texture.data[1].g = 0;
+  // texture.data[0].b = 0;
+  // texture.data[1].b = 0;
+
+  Image<RGB_24bits> original_picture = {
+    .width = dib_header.image_width,
+    .height = dib_header.image_height,
+    .buffer = &texture,
+  };
 
   Image<RGB_24bits> image = {
     .width = dib_header.image_width / 2,
@@ -335,6 +376,18 @@ void load_and_size_down(const char *file_path, const char *file_out_path)
     .data  = new RGB_24bits[image.width * image.height],
   };
   image.buffer = &new_texture;
+
+  for (size_t x = 0; x < image.width; x++)
+  {
+    for (size_t y = 0; y < image.height; y++)
+    {
+      float y_coord = y / (float) image.height;
+      float x_coord = x / (float) image.width;
+
+      RGB_24bits &pixel = image.buffer->data[y * image.width + x];
+      pixel = sampler2D(original_picture, x_coord, y_coord);
+    }
+  }
 
   // @todo João, por hora só cortei a resolução, mas preciso criar uma textura a partir da textura base
   auto new_file = make_bitmap_from_image_data(image.width, image.height, *image.buffer);
