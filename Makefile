@@ -14,7 +14,7 @@ build-folder-setup:
 	@ mkdir -p $(BUILD_FOLDER_NAME)
 
 main: build-folder-setup ./$(SOURCE_FOLDER_NAME)/main.cpp  
-	rm $(BUILD_FOLDER_NAME)/$(PROGRAM_NAME)
+	rm -f $(BUILD_FOLDER_NAME)/$(PROGRAM_NAME)
 	$(CC) ./$(SOURCE_FOLDER_NAME)/main.cpp -o $(BUILD_FOLDER_NAME)/$(PROGRAM_NAME) $(CFLAGS) $(LFLAGS) $(DEF)
 
 run: main

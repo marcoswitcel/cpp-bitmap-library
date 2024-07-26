@@ -6,6 +6,7 @@
 
 #include "./bitmap.cpp"
 #include "./array.hpp"
+#include "./color-sampler.hpp"
 
 void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Array<uint8_t> &file)
 {
@@ -324,15 +325,19 @@ void load_and_size_down(const char *file_path, const char *file_out_path)
   texture.data[0].b = 0;
   texture.data[1].b = 0;
 
-  const unsigned new_width = dib_header.image_width / 2;
-  const unsigned new_height = dib_header.image_height / 2;
-  Array<RGB_24bits> new_texture = {
-    .length = new_width * new_height,
-    .data  = new RGB_24bits[new_width * new_height],
+  Image<RGB_24bits> image = {
+    .width = dib_header.image_width / 2,
+    .height = dib_header.image_height / 2,
+    .buffer = NULL,
   };
+  Array<RGB_24bits> new_texture = {
+    .length = image.width * image.height,
+    .data  = new RGB_24bits[image.width * image.height],
+  };
+  image.buffer = &new_texture;
 
   // @todo João, por hora só cortei a resolução, mas preciso criar uma textura a partir da textura base
-  auto new_file = make_bitmap_from_image_data(new_width, new_height, new_texture);
+  auto new_file = make_bitmap_from_image_data(image.width, image.height, *image.buffer);
   
   // @todo João, WIP: terminar o size_down e mudar o nome do arquivo de saída
   // FILE *out = fopen(file_out_path, "wb");
