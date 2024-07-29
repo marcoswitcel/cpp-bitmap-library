@@ -298,6 +298,16 @@ Array<RGB_24bits>* make_contiguous_array_out_of_pixel_storage(Bitmap_File &bitma
   return texture;
 }
 
+Image<RGB_24bits> make_image_data_from_bitmap(Bitmap_File &bmp_file)
+{
+  Image<RGB_24bits> image = {
+    .width = bmp_file.dib->image_width,
+    .height = bmp_file.dib->image_height,
+    .buffer = make_contiguous_array_out_of_pixel_storage(bmp_file),
+  };
+
+  return image;
+}
 
 static inline RGB_24bits lerp(RGB_24bits v0, RGB_24bits v1, float percent)
 {
@@ -332,6 +342,32 @@ RGB_24bits sampler2D(Image<RGB_24bits> &texture, float xNormalized, float yNorma
   return lr;
 }
 
+Image<RGB_24bits> resize_image(const unsigned width, const unsigned height, Image<RGB_24bits> &source_image)
+{
+  Image<RGB_24bits> image = {
+    .width = width,
+    .height = height,
+    .buffer = new Array<RGB_24bits>,
+  };
+
+  image.buffer->length = width * height;
+  image.buffer->data  = new RGB_24bits[width * height];
+  
+  for (size_t x = 0; x < width; x++)
+  {
+    for (size_t y = 0; y < height; y++)
+    {
+      float y_coord = y / (float) height;
+      float x_coord = x / (float) width;
+
+      RGB_24bits &pixel = image.buffer->data[y * width + x];
+      pixel = sampler2D(source_image, x_coord, y_coord);
+    }
+  }
+
+  return image;
+}
+
 void load_and_size_down(const char *file_path, const char *file_out_path)
 {
   auto file = read_file_as_byte_array(file_path);
@@ -350,51 +386,18 @@ void load_and_size_down(const char *file_path, const char *file_out_path)
     .pixel_array = &file_pixel_array,
   };
 
-  Array<RGB_24bits> &texture = *make_contiguous_array_out_of_pixel_storage(bitmap_file);
+  Image<RGB_24bits> original_picture = make_image_data_from_bitmap(bitmap_file);
 
-  // dois pixeis alterados na lateral superior esquerda
-  // texture.data[0].r = 0;
-  // texture.data[1].r = 0;
-  // texture.data[0].g = 0;
-  // texture.data[1].g = 0;
-  // texture.data[0].b = 0;
-  // texture.data[1].b = 0;
+  auto resized_down = resize_image(dib_header.image_width / 2, dib_header.image_height / 2, original_picture);
+  auto resized_up = resize_image(dib_header.image_width * 2, dib_header.image_height * 2, original_picture);
 
-  Image<RGB_24bits> original_picture = {
-    .width = dib_header.image_width,
-    .height = dib_header.image_height,
-    .buffer = &texture,
-  };
-
-  Image<RGB_24bits> image = {
-    .width = dib_header.image_width / 2,
-    .height = dib_header.image_height / 2,
-    .buffer = NULL,
-  };
-  Array<RGB_24bits> new_texture = {
-    .length = image.width * image.height,
-    .data  = new RGB_24bits[image.width * image.height],
-  };
-  image.buffer = &new_texture;
-
-  for (size_t x = 0; x < image.width; x++)
-  {
-    for (size_t y = 0; y < image.height; y++)
-    {
-      float y_coord = y / (float) image.height;
-      float x_coord = x / (float) image.width;
-
-      RGB_24bits &pixel = image.buffer->data[y * image.width + x];
-      pixel = sampler2D(original_picture, x_coord, y_coord);
-    }
-  }
-
-  // @todo João, por hora só cortei a resolução, mas preciso criar uma textura a partir da textura base
-  auto new_file = make_bitmap_from_image_data(image.width, image.height, *image.buffer);
+  auto new_reseized_down = make_bitmap_from_image_data(resized_down.width, resized_down.height, *resized_down.buffer);
+  auto new_reseized_up = make_bitmap_from_image_data(resized_up.width, resized_up.height, *resized_up.buffer);
   
   // @todo João, WIP: terminar o size_down e mudar o nome do arquivo de saída
   // FILE *out = fopen(file_out_path, "wb");
-  export_bitmap_file_to_file(&new_file, "../image/sized-down.bmp");
+  export_bitmap_file_to_file(&new_reseized_down, "../image/sized-down.bmp");
+  export_bitmap_file_to_file(&new_reseized_up, "../image/sized-up.bmp");
 }
 
 typedef struct Command_Line_Arguments {
