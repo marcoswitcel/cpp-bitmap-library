@@ -7,6 +7,7 @@
 
 #include "./bitmap.cpp"
 #include "./array.hpp"
+#include "./command-line-utils.cpp"
 #include "./color-sampler.cpp"
 
 void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Array<uint8_t> &file)
@@ -205,30 +206,6 @@ void export_generated_image()
   Bitmap_File new_file = make_bitmap_from_image_data(width, height, image);
 
   export_bitmap_file_to_file(&new_file, filename.c_str());
-}
-
-int index_of_in_argv(const char *argument, int argc, const char *argv[])
-{
-  for (int i = 0; i < argc; i++)
-  {
-    if (!strcmp(argv[i], argument))
-    {
-      return i;
-    }
-  }
-  return -1;
-}
-
-bool is_string_present_in_argv(const char *switch_name, int argc, const char *argv[])
-{
-  for (int i = 0; i < argc; i++)
-  {
-    if (!strcmp(argv[i], switch_name))
-    {
-      return true;
-    }
-  }
-  return false;
 }
 
 void load_and_mofidy(const char *file_path, const char *file_out_path, bool emmit_header_info)
