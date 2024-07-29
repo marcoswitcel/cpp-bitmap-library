@@ -7,7 +7,7 @@
 
 #include "./bitmap.cpp"
 #include "./array.hpp"
-#include "./color-sampler.hpp"
+#include "./color-sampler.cpp"
 
 void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Array<uint8_t> &file)
 {
@@ -307,39 +307,6 @@ Image<RGB_24bits> make_image_data_from_bitmap(Bitmap_File &bmp_file)
   };
 
   return image;
-}
-
-static inline RGB_24bits lerp(RGB_24bits v0, RGB_24bits v1, float percent)
-{
-  return RGB_24bits {
-    .b = (uint8_t) (v0.b + ((v1.b - v0.b) * percent)),
-    .g = (uint8_t) (v0.g + ((v1.g - v0.g) * percent)),
-    .r = (uint8_t) (v0.r + ((v1.r - v0.r) * percent)),
-  };
-}
-
-RGB_24bits sampler2D(Image<RGB_24bits> &texture, float xNormalized, float yNormalized)
-{
-  using namespace std;
-
-  const auto width = texture.width;
-  const auto height = texture.height;
-
-  float x = width * xNormalized;
-  float y = height * yNormalized;
-  float xDecimal = (x - (long) x);
-  float yDecimal = (y - (long) y);
-
-  RGB_24bits c0 = texture.buffer->data[static_cast<size_t>(floor(y) * width + floor(x)) ];
-  RGB_24bits c1 = texture.buffer->data[static_cast<size_t>(floor(y) * width + ceil(x)) ];
-  RGB_24bits c2 = texture.buffer->data[static_cast<size_t>(ceil(y) * width + floor(x)) ];
-  RGB_24bits c3 = texture.buffer->data[static_cast<size_t>(ceil(y) * width + ceil(x)) ];
-
-  RGB_24bits l0 = lerp(c0, c1, xDecimal);
-  RGB_24bits l1 = lerp(c2, c3, xDecimal);
-  RGB_24bits lr = lerp(l0, l1, yDecimal);
-
-  return lr;
 }
 
 Image<RGB_24bits> resize_image(const unsigned width, const unsigned height, Image<RGB_24bits> &source_image)
