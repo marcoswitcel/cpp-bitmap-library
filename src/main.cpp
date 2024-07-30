@@ -232,15 +232,8 @@ Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file)
   return bitmap_file;
 }
 
-void load_and_mofidy(const char *file_path, const char *file_out_path, bool emmit_header_info)
+void load_and_mofidy(Array<uint8_t> &file, const char *file_out_path, bool emmit_header_info)
 {
-  if (emmit_header_info) printf("file path: %s\n", file_path);
-
-  auto file = read_file_as_byte_array(file_path);
-
-  if (emmit_header_info) printf("file size: %ld\n", file.length);
-
- 
   Bitmap_File &bitmap_file = *make_bitmap_out_of_file(file);
 
   /**
@@ -325,10 +318,8 @@ Image<RGB_24bits> resize_image(const unsigned width, const unsigned height, Imag
   return image;
 }
 
-void load_and_size_down(const char *file_path, const char *file_out_path)
+void load_and_size_down(Array<uint8_t> &file, const char *file_out_path)
 {
-  auto file = read_file_as_byte_array(file_path);
-
   Bitmap_File &bitmap_file = *make_bitmap_out_of_file(file);
 
   Image<RGB_24bits> original_picture = make_image_data_from_bitmap(bitmap_file);
@@ -398,9 +389,14 @@ int main(int argc, const char* argv[])
   arguments.file_in = argv[file_in_index + 1];
   arguments.file_out = argv[file_out_index + 1];
 
-  load_and_mofidy(arguments.file_in, arguments.file_out, arguments.emmit_header_info);
+  if (arguments.emmit_header_info) printf("file path: %s\n", arguments.file_in);
+  auto file = read_file_as_byte_array(arguments.file_in);
+  if (arguments.emmit_header_info) printf("file size: %ld\n", file.length);
 
-  if (arguments.size_down) load_and_size_down(arguments.file_in, arguments.file_out);
+  if (arguments.size_down) load_and_size_down(file, arguments.file_out);
+  
+  load_and_mofidy(file, arguments.file_out, arguments.emmit_header_info);
+
 
   if (arguments.is_export_sample) export_sample_01_2x2_image();
 
