@@ -10,6 +10,12 @@
 #include "./command-line-utils.cpp"
 #include "./color-sampler.cpp"
 
+typedef enum Filter_Name {
+  NONE,
+  GRAY,
+  LUMINOSITY,
+} Filter_Name;
+
 void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Array<uint8_t> &file)
 {
   printf("%c %c\n", bmp_header.header[0], bmp_header.header[1]);
@@ -232,7 +238,7 @@ Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file)
   return bitmap_file;
 }
 
-void load_and_mofidy(Array<uint8_t> &file, const char *file_out_path, bool emmit_header_info)
+void load_and_mofidy(Array<uint8_t> &file, const char *file_out_path, bool emmit_header_info, Filter_Name filter_name)
 {
   Bitmap_File &bitmap_file = *make_bitmap_out_of_file(file);
 
@@ -250,7 +256,18 @@ void load_and_mofidy(Array<uint8_t> &file, const char *file_out_path, bool emmit
   // primeira pixel no primeiro row, segundo pixel começa no primeiro row e termina ocupando metade do segundo
   // row, aí entrariam 2 bytes de padding
   assert(bitmap_file.dib->size_of_data % 4 == 0);
-  iterate_over_uncompressed_data(&bitmap_file, filter_RGB_24bits_luminosity);
+
+  switch (filter_name)
+  {
+    case NONE: break;
+    case GRAY:
+      iterate_over_uncompressed_data(&bitmap_file, filter_RGB_24bits_gray);
+    break;
+    case LUMINOSITY:
+      iterate_over_uncompressed_data(&bitmap_file, filter_RGB_24bits_luminosity);
+    break;
+    default: break;
+  }
 
 
   FILE *out = fopen(file_out_path, "wb");
@@ -345,6 +362,7 @@ typedef struct Command_Line_Arguments {
   const char *file_out;
   bool emmit_header_info;
   bool size_down;
+  const char *filter_name;
 } Command_Line_Arguments;
 
 int main(int argc, const char* argv[])
@@ -356,10 +374,12 @@ int main(int argc, const char* argv[])
     .file_out = NULL,
     .emmit_header_info = is_string_present_in_argv("--header-info", argc, argv),
     .size_down = is_string_present_in_argv("--size-down", argc, argv),
+    .filter_name = NULL,
   };
 
   int file_in_index = index_of_in_argv("--file-in", argc, argv);
   int file_out_index = index_of_in_argv("--file-out", argc, argv);
+  int filter_index = index_of_in_argv("--filter", argc, argv);
   
   if (file_in_index < 0)
   {
@@ -385,9 +405,23 @@ int main(int argc, const char* argv[])
     return EXIT_FAILURE;
   }
 
+  // @todo João, tornar o filtro opcional
+  if (filter_index < 0)
+  {
+    std::cout << "Parâmetro com o nome do filtro faltando.\n";
+    return EXIT_FAILURE;
+  }
+
+  if (filter_index + 1 >= argc)
+  {
+    std::cout << "Nome do filtro faltando.\n";
+    return EXIT_FAILURE;
+  }
+
   // @todo João, avisar se for o mesmo arquivo
   arguments.file_in = argv[file_in_index + 1];
   arguments.file_out = argv[file_out_index + 1];
+  arguments.filter_name = argv[filter_index + 1];
 
   if (arguments.emmit_header_info) printf("file path: %s\n", arguments.file_in);
   auto file = read_file_as_byte_array(arguments.file_in);
@@ -395,7 +429,18 @@ int main(int argc, const char* argv[])
 
   if (arguments.size_down) load_and_size_down(file, arguments.file_out);
   
-  load_and_mofidy(file, arguments.file_out, arguments.emmit_header_info);
+  Filter_Name filter_name = NONE;
+
+  if (!strcmp(arguments.filter_name, "gray"))
+  {
+    filter_name = GRAY;
+  }
+  else if (!strcmp(arguments.filter_name, "luminosity"))
+  {
+    filter_name = LUMINOSITY;
+  } 
+
+  load_and_mofidy(file, arguments.file_out, arguments.emmit_header_info, filter_name);
 
 
   if (arguments.is_export_sample) export_sample_01_2x2_image();
