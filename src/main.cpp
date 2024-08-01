@@ -75,7 +75,7 @@ void iterate_over_uncompressed_data(Bitmap_File *file, Filter_RGB_24bits func)
     return;
   }
 
-  const unsigned row_size_in_bytes = ((file->dib->n_bit_per_pixel * file->dib->image_width + 31) / 32) * 4;
+  const unsigned row_size_in_bytes = calculate_row_size(file->dib->n_bit_per_pixel, file->dib->image_width);
   
   for (unsigned row = 0; row < file->dib->image_height; row++)
   {
@@ -173,7 +173,7 @@ Bitmap_File make_bitmap_from_image_data(const unsigned width, const unsigned hei
 
   assert(new_file.dib->bitfield == BI_RGB);
 
-  const unsigned row_size_in_bytes = ((new_file.dib->n_bit_per_pixel * new_file.dib->image_width + 31) / 32) * 4;
+  const unsigned row_size_in_bytes = calculate_row_size(new_file.dib->n_bit_per_pixel, new_file.dib->image_width);
   
   for (unsigned row = 0; row < new_file.dib->image_height; row++)
   {
@@ -282,7 +282,7 @@ Array<RGB_24bits>* make_contiguous_array_out_of_pixel_storage(Bitmap_File &bitma
   texture->length = bitmap_file.dib->image_width * bitmap_file.dib->image_height;
   texture->data = new RGB_24bits[bitmap_file.dib->image_width * bitmap_file.dib->image_height];
 
-  const unsigned row_size_in_bytes = ((bitmap_file.dib->n_bit_per_pixel * bitmap_file.dib->image_width + 31) / 32) * 4;
+  const unsigned row_size_in_bytes = calculate_row_size(bitmap_file.dib->n_bit_per_pixel, bitmap_file.dib->image_width);
   
   for (unsigned row = 0; row < bitmap_file.dib->image_height; row++)
   {
