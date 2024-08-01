@@ -238,7 +238,7 @@ Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file)
   return bitmap_file;
 }
 
-void load_and_mofidy(Array<uint8_t> &file, const char *file_out_path, bool emmit_header_info, Filter_Name filter_name)
+void modify_pixel_storage(Array<uint8_t> &file, const char *file_out_path, bool emmit_header_info, Filter_Name filter_name)
 {
   Bitmap_File &bitmap_file = *make_bitmap_out_of_file(file);
 
@@ -440,7 +440,7 @@ int main(int argc, const char* argv[])
     filter_name = LUMINOSITY;
   } 
 
-  load_and_mofidy(file, arguments.file_out, arguments.emmit_header_info, filter_name);
+  modify_pixel_storage(file, arguments.file_out, arguments.emmit_header_info, filter_name);
 
 
   if (arguments.is_export_sample) export_sample_01_2x2_image();
