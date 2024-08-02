@@ -238,41 +238,30 @@ Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file)
   return bitmap_file;
 }
 
-void modify_pixel_storage(Array<uint8_t> &file, const char *file_out_path, bool emmit_header_info, Filter_Name filter_name)
+void apply_filter_to_image(Image<RGB_24bits> &image, Filter_Name filter_name)
 {
-  Bitmap_File &bitmap_file = *make_bitmap_out_of_file(file);
-
-  /**
-   * @note Os asserts abaixo refletem alguma conclusões que tirei sobre o layout da informação,
-   * conforme for obtendo mais arquivos ".bmp" para analisar, posso validar se as assertivas são
-   * verdadeiras em todas as configurações possíveis dos arquivos ".bmp"
-   */
-  assert((BITMAP_FILE_HEADER_SIZE + bitmap_file.dib->size) == bitmap_file.header->offset);
-  assert((BITMAP_FILE_HEADER_SIZE + bitmap_file.dib->size + bitmap_file.dib->size_of_data) == bitmap_file.header->size);
-
-  if (emmit_header_info) debug_print_info(*bitmap_file.header, *bitmap_file.dib, file);
-
-  // @note teoricamente seriam 6 bytes úteis e 2 de padding, rows de 4 bytes
-  // primeira pixel no primeiro row, segundo pixel começa no primeiro row e termina ocupando metade do segundo
-  // row, aí entrariam 2 bytes de padding
-  assert(bitmap_file.dib->size_of_data % 4 == 0);
+  Filter_RGB_24bits *func;
 
   switch (filter_name)
   {
-    case NONE: break;
+    case NONE: return;
     case GRAY:
-      iterate_over_uncompressed_data(&bitmap_file, filter_RGB_24bits_gray);
+      func = filter_RGB_24bits_gray;
     break;
     case LUMINOSITY:
-      iterate_over_uncompressed_data(&bitmap_file, filter_RGB_24bits_luminosity);
+      func = filter_RGB_24bits_luminosity;
     break;
     default: break;
   }
-
-
-  FILE *out = fopen(file_out_path, "wb");
-  fwrite(file.data, 1, file.length, out);
-  fclose(out);
+  
+  for (unsigned row = 0; row < image.height; row++)
+  {
+    for (unsigned col = 0; col < image.width; col++)
+    {
+      RGB_24bits *pixel = &image.buffer->data[row * image.width + col];
+      func(pixel, pixel);
+    }
+  }
 }
 
 Array<RGB_24bits>* make_contiguous_array_out_of_pixel_storage(Bitmap_File &bitmap_file)
@@ -333,26 +322,6 @@ Image<RGB_24bits> resize_image(const unsigned width, const unsigned height, Imag
   }
 
   return image;
-}
-
-void load_and_size_down(Array<uint8_t> &file, const char *file_out_path)
-{
-  Bitmap_File &bitmap_file = *make_bitmap_out_of_file(file);
-
-  Image<RGB_24bits> original_picture = make_image_data_from_bitmap(bitmap_file);
-
-  auto &dib_header = *bitmap_file.dib;
-
-  auto resized_down = resize_image(dib_header.image_width / 2, dib_header.image_height / 2, original_picture);
-  auto resized_up = resize_image(dib_header.image_width * 2, dib_header.image_height * 2, original_picture);
-
-  auto new_reseized_down = make_bitmap_from_image_data(resized_down.width, resized_down.height, *resized_down.buffer);
-  auto new_reseized_up = make_bitmap_from_image_data(resized_up.width, resized_up.height, *resized_up.buffer);
-  
-  // @todo João, WIP: terminar o size_down e mudar o nome do arquivo de saída
-  // FILE *out = fopen(file_out_path, "wb");
-  export_bitmap_file_to_file(&new_reseized_down, "../image/sized-down.bmp");
-  export_bitmap_file_to_file(&new_reseized_up, "../image/sized-up.bmp");
 }
 
 typedef struct Command_Line_Arguments {
@@ -427,7 +396,30 @@ int main(int argc, const char* argv[])
   auto file = read_file_as_byte_array(arguments.file_in);
   if (arguments.emmit_header_info) printf("file size: %ld\n", file.length);
 
-  if (arguments.size_down) load_and_size_down(file, arguments.file_out);
+  Bitmap_File &bitmap_file = *make_bitmap_out_of_file(file);
+
+  /**
+   * @note Os asserts abaixo refletem alguma conclusões que tirei sobre o layout da informação,
+   * conforme for obtendo mais arquivos ".bmp" para analisar, posso validar se as assertivas são
+   * verdadeiras em todas as configurações possíveis dos arquivos ".bmp"
+   */
+  assert((BITMAP_FILE_HEADER_SIZE + bitmap_file.dib->size) == bitmap_file.header->offset);
+  assert((BITMAP_FILE_HEADER_SIZE + bitmap_file.dib->size + bitmap_file.dib->size_of_data) == bitmap_file.header->size);
+
+  // @note teoricamente seriam 6 bytes úteis e 2 de padding, rows de 4 bytes
+  // primeira pixel no primeiro row, segundo pixel começa no primeiro row e termina ocupando metade do segundo
+  // row, aí entrariam 2 bytes de padding
+  assert(bitmap_file.dib->size_of_data % 4 == 0);
+
+  Image<RGB_24bits> image = make_image_data_from_bitmap(bitmap_file);
+
+  if (arguments.emmit_header_info) debug_print_info(*bitmap_file.header, *bitmap_file.dib, file); 
+  
+  if (arguments.size_down) 
+  {
+    // @todo João, receber width e height como argumento
+    image = resize_image(bitmap_file.dib->image_width / 2, bitmap_file.dib->image_height / 2, image);
+  }
   
   Filter_Name filter_name = NONE;
 
@@ -438,10 +430,14 @@ int main(int argc, const char* argv[])
   else if (!strcmp(arguments.filter_name, "luminosity"))
   {
     filter_name = LUMINOSITY;
-  } 
+  }
 
-  modify_pixel_storage(file, arguments.file_out, arguments.emmit_header_info, filter_name);
+  if (filter_name != NONE) apply_filter_to_image(image, filter_name);
 
+
+  auto new_image = make_bitmap_from_image_data(image.width, image.height, *image.buffer);
+  
+  export_bitmap_file_to_file(&new_image, arguments.file_out);
 
   if (arguments.is_export_sample) export_sample_01_2x2_image();
 
