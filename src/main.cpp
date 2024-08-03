@@ -142,7 +142,7 @@ Bitmap_File make_bitmap_from_image_data(const unsigned width, const unsigned hei
   Bitmap_File_Header *header = new Bitmap_File_Header;
   header->header[0] = 'B';
   header->header[1] = 'M';
-  header->size = BITMAP_DIB_HEADER_SIZE + BITMAP_FILE_HEADER_SIZE + pixel_storage_needed_in_bytes; // @todo aqui
+  header->size = BITMAP_DIB_HEADER_SIZE + BITMAP_FILE_HEADER_SIZE + pixel_storage_needed_in_bytes;
   header->application_specific = 0;
   header->application_specific2 = 0;
   header->offset = BITMAP_DIB_HEADER_SIZE + BITMAP_FILE_HEADER_SIZE; // soma do header mais o dib header
@@ -374,14 +374,7 @@ int main(int argc, const char* argv[])
     return EXIT_FAILURE;
   }
 
-  // @todo João, tornar o filtro opcional
-  if (filter_index < 0)
-  {
-    std::cout << "Parâmetro com o nome do filtro faltando.\n";
-    return EXIT_FAILURE;
-  }
-
-  if (filter_index + 1 >= argc)
+  if (filter_index > -1 && filter_index + 1 >= argc)
   {
     std::cout << "Nome do filtro faltando.\n";
     return EXIT_FAILURE;
@@ -390,7 +383,10 @@ int main(int argc, const char* argv[])
   // @todo João, avisar se for o mesmo arquivo
   arguments.file_in = argv[file_in_index + 1];
   arguments.file_out = argv[file_out_index + 1];
-  arguments.filter_name = argv[filter_index + 1];
+  if (filter_index > -1)
+  {
+    arguments.filter_name = argv[filter_index + 1];
+  }
 
   if (arguments.emmit_header_info) printf("file path: %s\n", arguments.file_in);
   auto file = read_file_as_byte_array(arguments.file_in);
@@ -423,13 +419,16 @@ int main(int argc, const char* argv[])
   
   Filter_Name filter_name = NONE;
 
-  if (!strcmp(arguments.filter_name, "gray"))
+  if (arguments.filter_name)
   {
-    filter_name = GRAY;
-  }
-  else if (!strcmp(arguments.filter_name, "luminosity"))
-  {
-    filter_name = LUMINOSITY;
+    if (!strcmp(arguments.filter_name, "gray"))
+    {
+      filter_name = GRAY;
+    }
+    else if (!strcmp(arguments.filter_name, "luminosity"))
+    {
+      filter_name = LUMINOSITY;
+    }
   }
 
   if (filter_name != NONE) apply_filter_to_image(image, filter_name);

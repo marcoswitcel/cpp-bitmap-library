@@ -24,7 +24,6 @@ const unsigned BITMAP_FILE_HEADER_SIZE = 14;
 
 /**
  * @brief DIB Header - Device-Independent Bitmap
- * @todo João, implementar
  */
 typedef struct DIB_Header {
   /**
