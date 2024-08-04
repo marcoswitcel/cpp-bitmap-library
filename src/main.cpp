@@ -332,6 +332,8 @@ typedef struct Command_Line_Arguments {
   bool emmit_header_info;
   bool size_down;
   const char *filter_name;
+  int width;
+  int height;
 } Command_Line_Arguments;
 
 int main(int argc, const char* argv[])
@@ -344,11 +346,15 @@ int main(int argc, const char* argv[])
     .emmit_header_info = is_string_present_in_argv("--header-info", argc, argv),
     .size_down = is_string_present_in_argv("--size-down", argc, argv),
     .filter_name = NULL,
+    .width = -1,
+    .height = -1,
   };
 
   int file_in_index = index_of_in_argv("--file-in", argc, argv);
   int file_out_index = index_of_in_argv("--file-out", argc, argv);
   int filter_index = index_of_in_argv("--filter", argc, argv);
+  int width_index = index_of_in_argv("--width", argc, argv);
+  int height_index = index_of_in_argv("--height", argc, argv);
   
   if (file_in_index < 0)
   {
@@ -380,12 +386,35 @@ int main(int argc, const char* argv[])
     return EXIT_FAILURE;
   }
 
+  if (width_index > -1 && width_index + 1 >= argc)
+  {
+    std::cout << "Width não especificada.\n";
+    return EXIT_FAILURE;
+  }
+
+  if (height_index > -1 && height_index + 1 >= argc)
+  {
+    std::cout << "Height não especificada.\n";
+    return EXIT_FAILURE;
+  }
+
   // @todo João, avisar se for o mesmo arquivo
   arguments.file_in = argv[file_in_index + 1];
   arguments.file_out = argv[file_out_index + 1];
+  
   if (filter_index > -1)
   {
     arguments.filter_name = argv[filter_index + 1];
+  }
+
+  if (width_index > -1)
+  {
+    arguments.width = std::stoi(argv[width_index + 1]);
+  }
+
+  if (height_index > -1)
+  {
+    arguments.height = std::stoi(argv[height_index + 1]);
   }
 
   if (arguments.emmit_header_info) printf("file path: %s\n", arguments.file_in);
@@ -413,8 +442,13 @@ int main(int argc, const char* argv[])
   
   if (arguments.size_down) 
   {
-    // @todo João, receber width e height como argumento
-    image = resize_image(bitmap_file.dib->image_width / 2, bitmap_file.dib->image_height / 2, image);
+    int width = bitmap_file.dib->image_width;
+    int height = bitmap_file.dib->image_height;
+
+    if (arguments.width != -1) width = arguments.width;
+    if (arguments.height != -1) height = arguments.height;
+
+    image = resize_image(width, height, image);
   }
   
   Filter_Name filter_name = NONE;
