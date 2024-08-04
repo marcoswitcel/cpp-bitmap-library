@@ -398,9 +398,18 @@ int main(int argc, const char* argv[])
     return EXIT_FAILURE;
   }
 
-  // @todo João, avisar se for o mesmo arquivo
   arguments.file_in = argv[file_in_index + 1];
   arguments.file_out = argv[file_out_index + 1];
+
+  /**
+   * @note Por hora faço uma checagem simples, mas seria interessante uma checagem mais complexa
+   * para garantir que o nome do arquivo não é o mesmo. Outra questão seria uma opção para forçar o override.
+   */
+  if (!strcmp(arguments.file_in, arguments.file_out))
+  {
+    std::cout << "O nome do arquivo de entrada e o de saída precisam ser diferentes.\n";
+    return EXIT_FAILURE;
+  }
   
   if (filter_index > -1)
   {
