@@ -214,21 +214,21 @@ void export_generated_image()
   export_bitmap_file_to_file(&new_file, filename.c_str());
 }
 
-Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file)
+Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file_data)
 {
   Bitmap_File_Header *header = new Bitmap_File_Header;
-  *header = extract_bitmap_file_header_from_byte_array(file);
+  *header = extract_bitmap_file_header_from_byte_array(file_data);
 
   DIB_Header *dib = new DIB_Header;
-  *dib = extract_dib_file_header_from_byte_array(file);
+  *dib = extract_dib_file_header_from_byte_array(file_data);
   
   Array<uint8_t> *file_pixel_array = new Array<uint8_t>;
   file_pixel_array->length = dib->size_of_data;
   // @todo João, fazer uma cópia
-  file_pixel_array->data = &file[header->offset];
+  file_pixel_array->data = &file_data[header->offset];
 
-  assert(&file.data[header->offset] == file_pixel_array->data);
-  assert(file_pixel_array->length == (file.length - header->offset));
+  assert(&file_data.data[header->offset] == file_pixel_array->data);
+  assert(file_pixel_array->length == (file_data.length - header->offset));
   
   Bitmap_File *bitmap_file = new Bitmap_File;
   bitmap_file->header = header;
@@ -431,9 +431,6 @@ int main(int argc, const char* argv[])
   assert((BITMAP_FILE_HEADER_SIZE + bitmap_file.dib->size) == bitmap_file.header->offset);
   assert((BITMAP_FILE_HEADER_SIZE + bitmap_file.dib->size + bitmap_file.dib->size_of_data) == bitmap_file.header->size);
 
-  // @note teoricamente seriam 6 bytes úteis e 2 de padding, rows de 4 bytes
-  // primeira pixel no primeiro row, segundo pixel começa no primeiro row e termina ocupando metade do segundo
-  // row, aí entrariam 2 bytes de padding
   assert(bitmap_file.dib->size_of_data % 4 == 0);
 
   Image<RGB_24bits> image = make_image_data_from_bitmap(bitmap_file);
