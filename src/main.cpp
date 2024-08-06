@@ -432,6 +432,12 @@ int main(int argc, const char* argv[])
 
   Bitmap_File &bitmap_file = *make_bitmap_out_of_file(file);
 
+  if (bitmap_file.dib->bitfield != BI_RGB)
+  {
+    std::cout << "O arquivo possui compressão, não suportado.\n";
+    return EXIT_FAILURE;
+  }
+
   /**
    * @note Os asserts abaixo refletem alguma conclusões que tirei sobre o layout da informação,
    * conforme for obtendo mais arquivos ".bmp" para analisar, posso validar se as assertivas são
