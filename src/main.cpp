@@ -324,6 +324,14 @@ Image<RGB_24bits> resize_image(const unsigned width, const unsigned height, Imag
   return image;
 }
 
+void print_help_info()
+{
+  std::cout << "Bitmap Tool\n";
+  std::cout << "Informação de uso:\n";
+  std::cout << "--help: exibe ajuda\n";
+  // @todo João, implementar explicações dos comandos
+}
+
 typedef struct Command_Line_Arguments {
   bool is_generated_image;
   bool is_export_sample;
@@ -334,6 +342,8 @@ typedef struct Command_Line_Arguments {
   const char *filter_name;
   int width;
   int height;
+  bool help;
+  // @todo João, implementar comando para imprimir a versão, possivelmente com a data? ou hash do commit?
 } Command_Line_Arguments;
 
 int main(int argc, const char* argv[])
@@ -348,7 +358,14 @@ int main(int argc, const char* argv[])
     .filter_name = NULL,
     .width = -1,
     .height = -1,
+    .help = is_string_present_in_argv("--help", argc, argv),
   };
+
+  if (arguments.help)
+  {
+    print_help_info();
+    return EXIT_SUCCESS;
+  }
 
   int file_in_index = index_of_in_argv("--file-in", argc, argv);
   int file_out_index = index_of_in_argv("--file-out", argc, argv);
