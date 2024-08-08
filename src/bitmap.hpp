@@ -1,12 +1,7 @@
-#ifndef __BITMAP_H_
-#define __BITMAP_H_
+#pragma once
 
 #include "./array.hpp"
 
-typedef struct Bitmap {
-  unsigned width;
-  unsigned height;
-} Bitmap;
 
 /**
  * @brief cabeçalho do arquivo - contém informação sobre o arquivo
@@ -85,5 +80,3 @@ typedef struct RGB_24bits {
   uint8_t g;
   uint8_t r;
 } RGB_24bits;
-
-#endif // __BITMAP_H_

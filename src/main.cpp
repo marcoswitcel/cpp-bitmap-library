@@ -33,14 +33,6 @@ void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Ar
   printf("dib: print_resolution_vertical: %d\n", dib_header.print_resolution_vertical);
   printf("dib: n_colors_in_palette: %d\n", dib_header.n_colors_in_palette);
   printf("dib: important_colors: %d\n", dib_header.important_colors);
-
-  printf("first pixel: red: %d\n", file.data[bmp_header.offset + 0]);
-  printf("first pixel: green: %d\n", file.data[bmp_header.offset + 1]);
-  printf("first pixel: blue: %d\n", file.data[bmp_header.offset + 2]);
-
-  printf("second pixel: red: %d\n", file.data[bmp_header.offset + 3]);
-  printf("second pixel: green: %d\n", file.data[bmp_header.offset + 4]);
-  printf("second pixel: blue: %d\n", file.data[bmp_header.offset + 5]);
 }
 
 typedef void Filter_RGB_24bits(const RGB_24bits *in, RGB_24bits *out);
