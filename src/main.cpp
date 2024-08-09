@@ -330,7 +330,7 @@ typedef struct Command_Line_Arguments {
   const char *file_in;
   const char *file_out;
   bool emmit_header_info;
-  bool size_down;
+  bool resize;
   const char *filter_name;
   int width;
   int height;
@@ -346,7 +346,7 @@ int main(int argc, const char* argv[])
     .file_in = NULL,
     .file_out = NULL,
     .emmit_header_info = is_string_present_in_argv("--header-info", argc, argv),
-    .size_down = is_string_present_in_argv("--size-down", argc, argv),
+    .resize = is_string_present_in_argv("--resize", argc, argv),
     .filter_name = NULL,
     .width = -1,
     .height = -1,
@@ -461,7 +461,7 @@ int main(int argc, const char* argv[])
 
   if (arguments.emmit_header_info) debug_print_info(*bitmap_file.header, *bitmap_file.dib, file); 
   
-  if (arguments.size_down) 
+  if (arguments.resize) 
   {
     int width = bitmap_file.dib->image_width;
     int height = bitmap_file.dib->image_height;
