@@ -14,6 +14,7 @@ typedef enum Filter_Name {
   NONE,
   GRAY,
   LUMINOSITY,
+  BLUE_CHANNEL,
 } Filter_Name;
 
 void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Array<uint8_t> &file)
@@ -53,7 +54,7 @@ void filter_RGB_24bits_luminosity(const RGB_24bits *in, RGB_24bits *out)
 
 void filter_RGB_24bits_blue(const RGB_24bits *in, RGB_24bits *out)
 {
-  out->b = 255;
+  out->b = in->b;
   out->g = 0;
   out->r = 0;
 }
@@ -242,6 +243,9 @@ void apply_filter_to_image(Image<RGB_24bits> &image, Filter_Name filter_name)
     break;
     case LUMINOSITY:
       func = filter_RGB_24bits_luminosity;
+    break;
+    case BLUE_CHANNEL:
+      func = filter_RGB_24bits_blue;
     break;
     default: break;
   }
@@ -507,6 +511,10 @@ int main(int argc, const char* argv[])
     else if (!strcmp(arguments.filter_name, "luminosity"))
     {
       filter_name = LUMINOSITY;
+    }
+    else if (!strcmp(arguments.filter_name, "blue_channel"))
+    {
+      filter_name = BLUE_CHANNEL;
     }
   }
 
