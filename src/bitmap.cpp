@@ -9,6 +9,13 @@
 using Byte_Array = Array<uint8_t>;
 
 /**
+ * @note  Por hora só existe a implementação para arquiteturas com "Byte Ordering" "Little Endian"
+ */
+#ifndef BYTE_ORDERING_LITTLE_ENDIAN
+  #error "Suporte a arquitetura big endian não implementado."
+#endif
+
+/**
  * @brief 
  * @note Implementar um retorno de sucesso ou falha, não sair do programa nessa rotina 
  * 
@@ -68,14 +75,13 @@ Bitmap_File_Header extract_bitmap_file_header_from_byte_array(Byte_Array data)
   header.header[0] = data[0]; // B
   header.header[1] = data[1]; // M
 
-  // @todo João, verificar como fazer para identificação da endianess do sistema para implementar
-  // o código necessário para Big Endian
+  // @note :littleEndianOnly
   header.size = *((uint32_t*) &data[2]);
 
   header.application_specific = *((uint16_t*) &data[6]);
   header.application_specific2 = *((uint16_t*) &data[8]);
 
-  // @todo João, suportart Big Endian
+  // @note :littleEndianOnly
   header.offset = *((uint32_t*) &data[10]);
   
   return header;

@@ -3,7 +3,7 @@
 CC = g++
 CFLAGS = -Wall -Wextra -pedantic -std=c++2a # -fsanitize=address -g
 LFLAGS =
-DEF = -DDEV_CODE_ENABLED
+DEF = -DDEV_CODE_ENABLED -DBYTE_ORDERING_LITTLE_ENDIAN
 
 # Configurações gerais
 SOURCE_FOLDER_NAME=src
