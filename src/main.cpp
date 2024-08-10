@@ -319,7 +319,13 @@ Image<RGB_24bits> resize_image(const unsigned width, const unsigned height, Imag
 void print_help_info()
 {
   std::cout << "Bitmap Tool\n";
-  std::cout << "Informação de uso:\n";
+  #ifdef PROGRAM_VERSION
+  std::cout << "Versão: "<< PROGRAM_VERSION << "\n";
+  #endif
+  #ifdef BUILD_TIMESTAMP
+  std::cout << "Timestamp: "<< BUILD_TIMESTAMP << "\n";
+  #endif
+  std::cout << "\nInformação de uso:\n";
   std::cout << "--help: exibe ajuda\n";
   // @todo João, implementar explicações dos comandos
 }
