@@ -330,6 +330,17 @@ void print_help_info()
   // @todo João, implementar explicações dos comandos
 }
 
+void print_version_info()
+{
+  std::cout << "Bitmap Tool\n";
+  #ifdef PROGRAM_VERSION
+  std::cout << "Versão: "<< PROGRAM_VERSION << "\n";
+  #endif
+  #ifdef BUILD_TIMESTAMP
+  std::cout << "Timestamp: "<< BUILD_TIMESTAMP << "\n";
+  #endif
+}
+
 typedef struct Command_Line_Arguments {
   bool is_generated_image;
   bool is_export_sample;
@@ -341,7 +352,7 @@ typedef struct Command_Line_Arguments {
   int width;
   int height;
   bool help;
-  // @todo João, implementar comando para imprimir a versão, possivelmente com a data? ou hash do commit?
+  bool version;
 } Command_Line_Arguments;
 
 int main(int argc, const char* argv[])
@@ -357,11 +368,18 @@ int main(int argc, const char* argv[])
     .width = -1,
     .height = -1,
     .help = is_string_present_in_argv("--help", argc, argv),
+    .version = is_string_present_in_argv("--version", argc, argv),
   };
 
   if (arguments.help)
   {
     print_help_info();
+    return EXIT_SUCCESS;
+  }
+
+  if (arguments.version)
+  {
+    print_version_info();
     return EXIT_SUCCESS;
   }
 
