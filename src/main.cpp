@@ -141,6 +141,7 @@ void export_sample_01_2x2_image()
   };
 
   std::string filename = "../image/image-new.bmp";
+  // @todo João, apresentar erros aqui caso não consiga abrir o arquivo para persistência.
   export_bitmap_file_to_file(&new_file, filename.c_str());
 }
 
@@ -220,6 +221,7 @@ void export_generated_image()
 
   Bitmap_File new_file = make_bitmap_from_image_data(width, height, image);
 
+  // @todo João, apresentar erros aqui caso não consiga abrir o arquivo para persistência.
   export_bitmap_file_to_file(&new_file, filename.c_str());
 }
 
@@ -553,6 +555,7 @@ int main(int argc, const char* argv[])
 
   auto new_image = make_bitmap_from_image_data(image.width, image.height, *image.buffer);
   
+  // @todo João, apresentar erros aqui caso não consiga abrir o arquivo para persistência.
   export_bitmap_file_to_file(&new_image, arguments.file_out);
 
   if (arguments.is_export_sample) export_sample_01_2x2_image();

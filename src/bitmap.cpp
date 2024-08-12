@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "./bitmap.hpp"
 
@@ -87,23 +88,32 @@ Bitmap_File_Header extract_bitmap_file_header_from_byte_array(Byte_Array data)
   return header;
 }
 
-void export_bitmap_file_to_file(Bitmap_File *file, const char *filename)
+bool export_bitmap_file_to_file(Bitmap_File *file, const char *filename)
 {
   FILE *out = fopen(filename, "wb");
-  
-  // @todo João, não performático... porém por hora está bom
-  fwrite(&file->header->header, 1, sizeof(Bitmap_File_Header::header), out);
-  fwrite(&file->header->size, 1, sizeof(Bitmap_File_Header::size), out);
-  fwrite(&file->header->application_specific, 1, sizeof(Bitmap_File_Header::application_specific), out);
-  fwrite(&file->header->application_specific2, 1, sizeof(Bitmap_File_Header::application_specific2), out);
-  fwrite(&file->header->offset, 1, sizeof(Bitmap_File_Header::offset), out);
 
-  // @note Pode quebrar dependendo do padding, ajustar no futuro
+  if (out == NULL) return false;
+  
+  uint8_t bitmap_file_header[BITMAP_FILE_HEADER_SIZE];
+
+  memcpy(&bitmap_file_header[0], &file->header->header, sizeof(Bitmap_File_Header::header));
+  memcpy(&bitmap_file_header[2], &file->header->size, sizeof(Bitmap_File_Header::size));
+  memcpy(&bitmap_file_header[6], &file->header->application_specific, sizeof(Bitmap_File_Header::application_specific));
+  memcpy(&bitmap_file_header[8], &file->header->application_specific2, sizeof(Bitmap_File_Header::application_specific2));
+  memcpy(&bitmap_file_header[10], &file->header->offset, sizeof(Bitmap_File_Header::offset));
+
+  fwrite(&bitmap_file_header, 1, BITMAP_FILE_HEADER_SIZE, out);
+
+  // @note Pode quebrar dependendo do padding, por isso o assert, para garantir
+  // que se compilar a plataforma é suportada.
+  static_assert(sizeof(DIB_Header) == BITMAP_DIB_HEADER_SIZE);
   fwrite(file->dib, 1, sizeof(DIB_Header), out);
 
   fwrite(file->pixel_array->data, 1, file->pixel_array->length, out);
   
   fclose(out);
+
+  return true;
 }
 
 static inline auto calculate_row_size(uint8_t n_bit_per_pixel, size_t image_width)

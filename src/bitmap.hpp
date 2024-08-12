@@ -45,7 +45,7 @@ typedef struct DIB_Header {
 
 } DIB_Header;
 
-const auto BITMAP_DIB_HEADER_SIZE =  sizeof(DIB_Header);
+const auto BITMAP_DIB_HEADER_SIZE =  40;
 
 typedef enum Compression_Method {
   BI_RGB = 0, // sem compressão
