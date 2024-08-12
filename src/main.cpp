@@ -14,6 +14,8 @@ typedef enum Filter_Name {
   NONE,
   GRAY,
   LUMINOSITY,
+  RED_CHANNEL,
+  GREEN_CHANNEL,
   BLUE_CHANNEL,
 } Filter_Name;
 
@@ -56,6 +58,20 @@ void filter_RGB_24bits_blue(const RGB_24bits *in, RGB_24bits *out)
 {
   out->b = in->b;
   out->g = 0;
+  out->r = 0;
+}
+
+void filter_RGB_24bits_red(const RGB_24bits *in, RGB_24bits *out)
+{
+  out->b = 0;
+  out->g = 0;
+  out->r = in->r;
+}
+
+void filter_RGB_24bits_green(const RGB_24bits *in, RGB_24bits *out)
+{
+  out->b = 0;
+  out->g = in->g;
   out->r = 0;
 }
 
@@ -246,6 +262,12 @@ void apply_filter_to_image(Image<RGB_24bits> &image, Filter_Name filter_name)
     break;
     case BLUE_CHANNEL:
       func = filter_RGB_24bits_blue;
+    break;
+    case RED_CHANNEL:
+      func = filter_RGB_24bits_red;
+    break;
+    case GREEN_CHANNEL:
+      func = filter_RGB_24bits_green;
     break;
     default: break;
   }
@@ -515,6 +537,14 @@ int main(int argc, const char* argv[])
     else if (!strcmp(arguments.filter_name, "blue_channel"))
     {
       filter_name = BLUE_CHANNEL;
+    }
+    else if (!strcmp(arguments.filter_name, "red_channel"))
+    {
+      filter_name = RED_CHANNEL;
+    }
+    else if (!strcmp(arguments.filter_name, "green_channel"))
+    {
+      filter_name = GREEN_CHANNEL;
     }
   }
 
