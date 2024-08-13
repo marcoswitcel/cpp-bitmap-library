@@ -140,9 +140,16 @@ void export_sample_01_2x2_image()
     .pixel_array = &pixel_array,
   };
 
-  std::string filename = "../image/image-new.bmp";
-  // @todo João, apresentar erros aqui caso não consiga abrir o arquivo para persistência.
-  export_bitmap_file_to_file(&new_file, filename.c_str());
+  std::string filename = "sample-01-2x2.bmp";
+  
+  if (export_bitmap_file_to_file(&new_file, filename.c_str()))
+  {
+    printf("Arquivo sample gerado e exportado. Arquivo: '%s'.\n", filename.c_str());
+  }
+  else
+  {
+    printf("Arquivo sample não pode ser gerado e exportado. Arquivo: '%s'.\n", filename.c_str());
+  }
 }
 
 Bitmap_File make_bitmap_from_image_data(const unsigned width, const unsigned height, Array<RGB_24bits> &image)
@@ -223,30 +230,6 @@ void export_generated_image()
 
   // @todo João, apresentar erros aqui caso não consiga abrir o arquivo para persistência.
   export_bitmap_file_to_file(&new_file, filename.c_str());
-}
-
-Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file_data)
-{
-  Bitmap_File_Header *header = new Bitmap_File_Header;
-  *header = extract_bitmap_file_header_from_byte_array(file_data);
-
-  DIB_Header *dib = new DIB_Header;
-  *dib = extract_dib_file_header_from_byte_array(file_data);
-  
-  Array<uint8_t> *file_pixel_array = new Array<uint8_t>;
-  file_pixel_array->length = dib->size_of_data;
-  // @todo João, fazer uma cópia
-  file_pixel_array->data = &file_data[header->offset];
-
-  assert(&file_data.data[header->offset] == file_pixel_array->data);
-  assert(file_pixel_array->length == (file_data.length - header->offset));
-  
-  Bitmap_File *bitmap_file = new Bitmap_File;
-  bitmap_file->header = header;
-  bitmap_file->dib = dib;
-  bitmap_file->pixel_array = file_pixel_array;
-
-  return bitmap_file;
 }
 
 void apply_filter_to_image(Image<RGB_24bits> &image, Filter_Name filter_name)

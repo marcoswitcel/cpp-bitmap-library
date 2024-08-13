@@ -116,6 +116,30 @@ bool export_bitmap_file_to_file(Bitmap_File *file, const char *filename)
   return true;
 }
 
+Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file_data)
+{
+  Bitmap_File_Header *header = new Bitmap_File_Header;
+  *header = extract_bitmap_file_header_from_byte_array(file_data);
+
+  DIB_Header *dib = new DIB_Header;
+  *dib = extract_dib_file_header_from_byte_array(file_data);
+  
+  Array<uint8_t> *file_pixel_array = new Array<uint8_t>;
+  file_pixel_array->length = dib->size_of_data;
+  // @todo João, fazer uma cópia
+  file_pixel_array->data = &file_data[header->offset];
+
+  assert(&file_data.data[header->offset] == file_pixel_array->data);
+  assert(file_pixel_array->length == (file_data.length - header->offset));
+  
+  Bitmap_File *bitmap_file = new Bitmap_File;
+  bitmap_file->header = header;
+  bitmap_file->dib = dib;
+  bitmap_file->pixel_array = file_pixel_array;
+
+  return bitmap_file;
+}
+
 static inline auto calculate_row_size(uint8_t n_bit_per_pixel, size_t image_width)
 {
   return ((n_bit_per_pixel * image_width + 31) / 32) * 4;
