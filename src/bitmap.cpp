@@ -53,6 +53,14 @@ DIB_Header extract_dib_file_header_from_byte_array(Byte_Array data)
   DIB_Header dib;
 
   dib.size = *((uint32_t*) &data[dib_header_offset]);
+
+  /**
+   * @todo João, Por hora vou for apenas esse assert, mas na prática preciso validar se for um DIB
+   * diferente do que suporto atualmente preciso retornar um erro.
+   * Já estou encontrando cenários que esse assert não é verdadeiro.
+   */
+  // assert(dib.size == BITMAP_DIB_HEADER_SIZE);
+  
   dib.image_width = *((uint32_t*) &data[dib_header_offset + 4]);
   dib.image_height = *((uint32_t*) &data[dib_header_offset + 8]);
 
