@@ -224,12 +224,18 @@ void export_generated_image()
     pixel.b = ((i / width) / ((float) height)) * 255;
   }
 
-  std::string filename = "../image/image-generated.bmp";
+  std::string filename = "image-generated.bmp";
 
   Bitmap_File new_file = make_bitmap_from_image_data(width, height, image);
 
-  // @todo João, apresentar erros aqui caso não consiga abrir o arquivo para persistência.
-  export_bitmap_file_to_file(&new_file, filename.c_str());
+  if (export_bitmap_file_to_file(&new_file, filename.c_str()))
+  {
+    printf("Arquivo gradiente gerado e exportado. Arquivo: '%s'.\n", filename.c_str());
+  }
+  else
+  {
+    printf("Arquivo gradiente não pode ser gerado e exportado. Arquivo: '%s'.\n", filename.c_str());
+  }
 }
 
 void apply_filter_to_image(Image<RGB_24bits> &image, Filter_Name filter_name)
