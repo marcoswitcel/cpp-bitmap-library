@@ -260,7 +260,7 @@ void apply_filter_to_image(Image<RGB_24bits> &image, Filter_Name filter_name)
     case GREEN_CHANNEL:
       func = filter_RGB_24bits_green;
     break;
-    default: break;
+    default: return;
   }
   
   for (unsigned row = 0; row < image.height; row++)
