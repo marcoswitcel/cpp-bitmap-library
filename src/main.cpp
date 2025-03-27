@@ -36,6 +36,8 @@ void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Ar
   printf("dib: print_resolution_vertical: %d\n", dib_header.print_resolution_vertical);
   printf("dib: n_colors_in_palette: %d\n", dib_header.n_colors_in_palette);
   printf("dib: important_colors: %d\n", dib_header.important_colors);
+
+  printf("file: %ld bytes\n", file.length);
 }
 
 typedef void Filter_RGB_24bits(const RGB_24bits *in, RGB_24bits *out);
