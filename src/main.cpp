@@ -345,8 +345,16 @@ void print_help_info()
   std::cout << "Timestamp: "<< BUILD_TIMESTAMP << "\n";
   #endif
   std::cout << "\nInformação de uso:\n";
-  std::cout << "--help: exibe ajuda\n";
-  // @todo João, implementar explicações dos comandos
+  std::cout << "Parâmetros obrigatórios:\n";
+  std::cout << " --file-in: especifica o nome do arquivo de entrada\n";
+  std::cout << "Parâmetros opcionais:\n";
+  std::cout << " --help: exibe ajuda\n";
+  std::cout << " --resize: permite trocar resolução de saída do arquivo. e.x: --resize --width 500 --height 200\n";
+  std::cout << "   --width: controla altura da imagem em pixels\n";
+  std::cout << "   --height: controla largura da imagem em pixels\n";
+  std::cout << " --version: exibe versão do build\n";
+  std::cout << " --file-out: especifica o nome do arquivo de saída\n";
+  std::cout << " --filter: especifica o nome do filtro a ser aplicado\n"; // @todo João, listar aqui os nomes dos filtros
 }
 
 void print_version_info()
