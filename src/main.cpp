@@ -7,17 +7,10 @@
 
 #include "./bitmap.cpp"
 #include "./array.hpp"
+#include "./filters.cpp"
 #include "./command-line-utils.cpp"
 #include "./color-sampler.cpp"
 
-typedef enum Filter_Name {
-  NONE,
-  GRAY,
-  LUMINOSITY,
-  RED_CHANNEL,
-  GREEN_CHANNEL,
-  BLUE_CHANNEL,
-} Filter_Name;
 
 void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Array<uint8_t> &file)
 {
@@ -38,43 +31,6 @@ void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Ar
   printf("dib: important_colors: %d\n", dib_header.important_colors);
 
   printf("file: %ld bytes\n", file.length);
-}
-
-typedef void Filter_RGB_24bits(const RGB_24bits *in, RGB_24bits *out);
-
-void filter_RGB_24bits_gray(const RGB_24bits *in, RGB_24bits *out)
-{
-  out->b = in->g;
-  out->g = in->g;
-  out->r = in->g;
-}
-
-void filter_RGB_24bits_luminosity(const RGB_24bits *in, RGB_24bits *out)
-{
-  out->b = in->b / 2;
-  out->g = in->g / 2;
-  out->r = in->r / 2;
-}
-
-void filter_RGB_24bits_blue(const RGB_24bits *in, RGB_24bits *out)
-{
-  out->b = in->b;
-  out->g = 0;
-  out->r = 0;
-}
-
-void filter_RGB_24bits_red(const RGB_24bits *in, RGB_24bits *out)
-{
-  out->b = 0;
-  out->g = 0;
-  out->r = in->r;
-}
-
-void filter_RGB_24bits_green(const RGB_24bits *in, RGB_24bits *out)
-{
-  out->b = 0;
-  out->g = in->g;
-  out->r = 0;
 }
 
 void iterate_over_uncompressed_data(Bitmap_File *file, Filter_RGB_24bits func)
