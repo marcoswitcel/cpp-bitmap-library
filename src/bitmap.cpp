@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "./bitmap.hpp"
+#include "./filters.hpp"
 
 using Byte_Array = Array<uint8_t>;
 

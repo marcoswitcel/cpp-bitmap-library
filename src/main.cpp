@@ -457,31 +457,9 @@ int main(int argc, const char* argv[])
     image = resize_image(width, height, image);
   }
   
-  Filter_Name filter_name = NONE;
-
-  if (arguments.filter_name)
-  {
-    if (!strcmp(arguments.filter_name, "gray"))
-    {
-      filter_name = GRAY;
-    }
-    else if (!strcmp(arguments.filter_name, "luminosity"))
-    {
-      filter_name = LUMINOSITY;
-    }
-    else if (!strcmp(arguments.filter_name, "blue_channel"))
-    {
-      filter_name = BLUE_CHANNEL;
-    }
-    else if (!strcmp(arguments.filter_name, "red_channel"))
-    {
-      filter_name = RED_CHANNEL;
-    }
-    else if (!strcmp(arguments.filter_name, "green_channel"))
-    {
-      filter_name = GREEN_CHANNEL;
-    }
-  }
+  bool found = false;
+  Filter_Name filter_name = lookup_filter_by_name(arguments.filter_name, &found);
+  // @todo João, reportar em caso de nome de filtro não encontrado ser passado aqui
 
   if (filter_name != NONE) apply_filter_to_image(image, filter_name);
 

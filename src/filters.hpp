@@ -11,4 +11,13 @@ typedef enum Filter_Name {
   BLUE_CHANNEL,
 } Filter_Name;
 
+const char* filter_name_as_cstring[] = {
+  "none",
+  "gray",
+  "luminosity",
+  "red_channel",
+  "green_channel",
+  "blue_channel",
+};
+
 typedef void Filter_RGB_24bits(const RGB_24bits *in, RGB_24bits *out);
