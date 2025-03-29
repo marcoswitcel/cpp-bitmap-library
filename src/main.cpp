@@ -33,28 +33,6 @@ void debug_print_info(Bitmap_File_Header &bmp_header, DIB_Header &dib_header, Ar
   printf("file: %ld bytes\n", file.length);
 }
 
-void iterate_over_uncompressed_data(Bitmap_File *file, Filter_RGB_24bits func)
-{
-  assert(file->dib->bitfield == BI_RGB);
-  if (file->dib->bitfield != BI_RGB)
-  {
-    printf("iterate_over_uncompressed_data chamado para um arquivo comprimido\n");
-    return;
-  }
-
-  const unsigned row_size_in_bytes = calculate_row_size(file->dib->n_bit_per_pixel, file->dib->image_width);
-  
-  for (unsigned row = 0; row < file->dib->image_height; row++)
-  {
-    const unsigned offset =  row * row_size_in_bytes;
-
-    for (unsigned col = 0; col < file->dib->image_width; col++)
-    {
-      RGB_24bits *pixel = (RGB_24bits *) &file->pixel_array->data[offset + col * 3];
-      func(pixel, pixel);
-    }
-  }
-}
 
 /**
  * @brief imagem de exemplo 1 da wikipedia, implementada aqui para testar a 

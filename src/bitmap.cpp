@@ -157,3 +157,26 @@ static inline auto calculate_pixel_storage(uint8_t n_bit_per_pixel, size_t image
 {
   return calculate_row_size(n_bit_per_pixel, image_width) * image_height;
 }
+
+void iterate_over_uncompressed_data(Bitmap_File *file, Filter_RGB_24bits func)
+{
+  assert(file->dib->bitfield == BI_RGB);
+  if (file->dib->bitfield != BI_RGB)
+  {
+    printf("iterate_over_uncompressed_data chamado para um arquivo comprimido\n");
+    return;
+  }
+
+  const unsigned row_size_in_bytes = calculate_row_size(file->dib->n_bit_per_pixel, file->dib->image_width);
+  
+  for (unsigned row = 0; row < file->dib->image_height; row++)
+  {
+    const unsigned offset =  row * row_size_in_bytes;
+
+    for (unsigned col = 0; col < file->dib->image_width; col++)
+    {
+      RGB_24bits *pixel = (RGB_24bits *) &file->pixel_array->data[offset + col * 3];
+      func(pixel, pixel);
+    }
+  }
+}
