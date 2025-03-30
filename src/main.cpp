@@ -460,7 +460,7 @@ int main(int argc, const char* argv[])
   bool found = false;
   Filter_Name filter_name = lookup_filter_by_name(arguments.filter_name, &found);
   
-  if (!found)
+  if (arguments.filter_name && !found)
   {
     std::cout << "Filtro não suportado: '" << arguments.filter_name << "'.\n";
     return EXIT_FAILURE;

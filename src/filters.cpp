@@ -40,6 +40,15 @@ void filter_RGB_24bits_green(const RGB_24bits *in, RGB_24bits *out)
   out->r = 0;
 }
 
+/**
+ * @brief busca pelo filtro que atenda pelo nome provido
+ * 
+ * @param name nome do filtro sendo buscado
+ * @param out ponteiro para booleano usado para indicar se o lookup foi bem sucedido
+ * @return Filter_Name NONE é retornado em caso do filtro nomeado 'none' ser requisitado ou no caso
+ * de o filtro buscado não existir, por isso para desambiguação existe o parâmetro 'out' para indicar se
+ * o lookup foi bem sucedido ou não.
+ */
 Filter_Name lookup_filter_by_name(const char *name, bool *out)
 {
   Filter_Name filter_name = NONE;
