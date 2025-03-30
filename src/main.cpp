@@ -459,7 +459,12 @@ int main(int argc, const char* argv[])
   
   bool found = false;
   Filter_Name filter_name = lookup_filter_by_name(arguments.filter_name, &found);
-  // @todo João, reportar em caso de nome de filtro não encontrado ser passado aqui
+  
+  if (!found)
+  {
+    std::cout << "Filtro não suportado: '" << arguments.filter_name << "'.\n";
+    return EXIT_FAILURE;
+  }
 
   if (filter_name != NONE) apply_filter_to_image(image, filter_name);
 
