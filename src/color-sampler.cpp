@@ -1,6 +1,10 @@
 #pragma once
 
+#include <stdlib.h>
+
 #include "./color-sampler.hpp"
+#include "./image.hpp"
+#include "./bitmap.hpp"
 
 template <typename Pixel_Type>
 static inline Pixel_Type lerp(Pixel_Type v0, Pixel_Type v1, float percent)
@@ -46,4 +50,30 @@ Pixel_Type sampler2D(Image<Pixel_Type> &texture, float x_normalized, float y_nor
   Pixel_Type lr = lerp(l0, l1, y_decimal);
 
   return lr;
+}
+
+Image<RGB_24bits> resize_image(const unsigned width, const unsigned height, Image<RGB_24bits> &source_image)
+{
+  Image<RGB_24bits> image = {
+    .width = width,
+    .height = height,
+    .buffer = new Array<RGB_24bits>,
+  };
+
+  image.buffer->length = width * height;
+  image.buffer->data  = new RGB_24bits[width * height];
+  
+  for (size_t x = 0; x < width; x++)
+  {
+    for (size_t y = 0; y < height; y++)
+    {
+      float y_coord = y / (float) height;
+      float x_coord = x / (float) width;
+
+      RGB_24bits &pixel = image.buffer->data[y * width + x];
+      pixel = sampler2D(source_image, x_coord, y_coord);
+    }
+  }
+
+  return image;
 }

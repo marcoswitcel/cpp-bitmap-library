@@ -4,8 +4,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "./bitmap.hpp"
+#include "./image.hpp"
 #include "./filters.hpp"
 
 using Byte_Array = Array<uint8_t>;
@@ -180,4 +182,92 @@ void iterate_over_uncompressed_data(Bitmap_File *file, Filter_RGB_24bits func)
       func(pixel, pixel);
     }
   }
+}
+
+static Array<RGB_24bits>* make_contiguous_array_out_of_pixel_storage(Bitmap_File &bitmap_file)
+{
+  Array<RGB_24bits> *texture = new Array<RGB_24bits>;
+  
+  texture->length = bitmap_file.dib->image_width * bitmap_file.dib->image_height;
+  texture->data = new RGB_24bits[bitmap_file.dib->image_width * bitmap_file.dib->image_height];
+
+  const unsigned row_size_in_bytes = calculate_row_size(bitmap_file.dib->n_bit_per_pixel, bitmap_file.dib->image_width);
+  
+  for (unsigned row = 0; row < bitmap_file.dib->image_height; row++)
+  {
+    const unsigned offset =  row * row_size_in_bytes;
+
+    for (unsigned col = 0; col < bitmap_file.dib->image_width; col++)
+    {
+      RGB_24bits *pixel = (RGB_24bits *) &bitmap_file.pixel_array->data[offset + col * 3];
+      texture->data[(bitmap_file.dib->image_height - 1 - row) * bitmap_file.dib->image_width + col] = *pixel;
+    }
+  }
+
+  return texture;
+}
+
+Image<RGB_24bits> make_image_data_from_bitmap(Bitmap_File &bmp_file)
+{
+  Image<RGB_24bits> image = {
+    .width = bmp_file.dib->image_width,
+    .height = bmp_file.dib->image_height,
+    .buffer = make_contiguous_array_out_of_pixel_storage(bmp_file),
+  };
+
+  return image;
+}
+
+Bitmap_File make_bitmap_from_image_data(const unsigned width, const unsigned height, Array<RGB_24bits> &image)
+{
+  const size_t pixel_storage_needed_in_bytes = calculate_pixel_storage(24, width, height);
+
+  Bitmap_File_Header *header = new Bitmap_File_Header;
+  header->header[0] = 'B';
+  header->header[1] = 'M';
+  header->size = BITMAP_DIB_HEADER_SIZE + BITMAP_FILE_HEADER_SIZE + pixel_storage_needed_in_bytes;
+  header->application_specific = 0;
+  header->application_specific2 = 0;
+  header->offset = BITMAP_DIB_HEADER_SIZE + BITMAP_FILE_HEADER_SIZE; // soma do header mais o dib header
+
+  DIB_Header *dib = new DIB_Header;
+  dib->size = BITMAP_DIB_HEADER_SIZE; // esse DIB Header tem tamanho de 40 bytes
+  dib->image_width = width;
+  dib->image_height = height;
+  dib->number_of_colors_planes = 1;
+  dib->n_bit_per_pixel = 24;
+  dib->bitfield = BI_RGB;
+  dib->size_of_data = pixel_storage_needed_in_bytes;
+  dib->print_resolution_horizontal = 2835;
+  dib->print_resolution_vertical = 2835;
+  dib->n_colors_in_palette = 0;
+  dib->important_colors = 0;
+
+  
+  Byte_Array *pixel_array = new Byte_Array;
+  pixel_array->length = pixel_storage_needed_in_bytes;
+  pixel_array->data = new uint8_t[pixel_storage_needed_in_bytes];
+
+  Bitmap_File new_file = {
+    .header = header,
+    .dib = dib,
+    .pixel_array = pixel_array,
+  };
+
+  assert(new_file.dib->bitfield == BI_RGB);
+
+  const unsigned row_size_in_bytes = calculate_row_size(new_file.dib->n_bit_per_pixel, new_file.dib->image_width);
+  
+  for (unsigned row = 0; row < new_file.dib->image_height; row++)
+  {
+    const unsigned offset =  row * row_size_in_bytes;
+
+    for (unsigned col = 0; col < new_file.dib->image_width; col++)
+    {
+      RGB_24bits *pixel = (RGB_24bits *) &new_file.pixel_array->data[offset + col * 3];
+      *pixel = image.data[(height - 1 - row) * width + col];
+    }
+  }
+
+  return new_file;
 }
