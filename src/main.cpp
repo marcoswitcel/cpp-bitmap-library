@@ -19,7 +19,7 @@
  * 
  * @url https://en.wikipedia.org/wiki/BMP_file_format#Example_1
  */
-void export_sample_01_2x2_image()
+void export_sample_01_2x2_image(bool verbose)
 {
   Bitmap_File_Header header = {
     .header = {'B', 'M'},
@@ -56,6 +56,8 @@ void export_sample_01_2x2_image()
   };
 
   std::string filename = "sample-01-2x2.bmp";
+
+  if (!verbose) return;
   
   if (export_bitmap_file_to_file(&new_file, filename.c_str()))
   {
@@ -67,7 +69,7 @@ void export_sample_01_2x2_image()
   }
 }
 
-void export_generated_image()
+void export_generated_image(bool verbose)
 {
   const unsigned width = 1920;
   const unsigned height = 1080;
@@ -88,6 +90,8 @@ void export_generated_image()
   std::string filename = "image-generated.bmp";
 
   Bitmap_File new_file = make_bitmap_from_image_data(width, height, image);
+
+  if (!verbose) return;
 
   if (export_bitmap_file_to_file(&new_file, filename.c_str()))
   {
@@ -153,6 +157,7 @@ void print_help_info()
   std::cout << "   --height: controla largura da imagem em pixels\n";
   std::cout << " --version: exibe versão do build\n";
   std::cout << " --file-out: especifica o nome do arquivo de saída\n";
+  std::cout << " --verbose: especifica se deve ou não descrever as operações através do output\n";
   std::cout << " --filter: especifica o nome do filtro a ser aplicado\n"; // @todo João, listar aqui os nomes dos filtros
 }
 
@@ -179,6 +184,7 @@ typedef struct Command_Line_Arguments {
   int height;
   bool help;
   bool version;
+  bool verbose;
 } Command_Line_Arguments;
 
 int main(int argc, const char* argv[])
@@ -195,6 +201,7 @@ int main(int argc, const char* argv[])
     .height = -1,
     .help = is_string_present_in_argv("--help", argc, argv),
     .version = is_string_present_in_argv("--version", argc, argv),
+    .verbose = is_string_present_in_argv("--verbose", argc, argv),
   };
 
   if (arguments.help)
@@ -338,18 +345,21 @@ int main(int argc, const char* argv[])
   
   auto success = export_bitmap_file_to_file(&new_image, arguments.file_out);
 
-  if (success)
+  if (arguments.verbose)
   {
-    printf("Criado com sucesso. Arquivo: '%s'.\n", arguments.file_out);
-  }
-  else
-  {
-    printf("Arquivo '%s' não pode ser criado.\n", arguments.file_out);
+    if (success)
+    {
+      printf("Criado com sucesso. Arquivo: '%s'.\n", arguments.file_out);
+    }
+    else
+    {
+      printf("Arquivo '%s' não pode ser criado.\n", arguments.file_out);
+    }
   }
 
-  if (arguments.is_export_sample) export_sample_01_2x2_image();
+  if (arguments.is_export_sample) export_sample_01_2x2_image(arguments.verbose);
 
-  if (arguments.is_generated_image) export_generated_image();
+  if (arguments.is_generated_image) export_generated_image(arguments.verbose);
 
   return EXIT_SUCCESS;
 }
