@@ -52,16 +52,26 @@ Pixel_Type sampler2D(Image<Pixel_Type> &texture, float x_normalized, float y_nor
   return lr;
 }
 
-Image<RGB_24bits> resize_image(const unsigned width, const unsigned height, Image<RGB_24bits> &source_image)
+/**
+ * @brief 
+ * 
+ * @tparam Pixel_Type um tipo que contenha os campos r, g, b em qualquer ordem.
+ * @param width 
+ * @param height 
+ * @param source_image 
+ * @return Image<Pixel_Type> 
+ */
+template <typename Pixel_Type>
+Image<Pixel_Type> resize_image(const unsigned width, const unsigned height, Image<Pixel_Type> &source_image)
 {
-  Image<RGB_24bits> image = {
+  Image<Pixel_Type> image = {
     .width = width,
     .height = height,
-    .buffer = new Array<RGB_24bits>,
+    .buffer = new Array<Pixel_Type>,
   };
 
   image.buffer->length = width * height;
-  image.buffer->data  = new RGB_24bits[width * height];
+  image.buffer->data  = new Pixel_Type[width * height];
   
   for (size_t x = 0; x < width; x++)
   {
@@ -70,7 +80,7 @@ Image<RGB_24bits> resize_image(const unsigned width, const unsigned height, Imag
       float y_coord = y / (float) height;
       float x_coord = x / (float) width;
 
-      RGB_24bits &pixel = image.buffer->data[y * width + x];
+      Pixel_Type &pixel = image.buffer->data[y * width + x];
       pixel = sampler2D(source_image, x_coord, y_coord);
     }
   }
