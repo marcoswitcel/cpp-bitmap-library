@@ -25,5 +25,9 @@ struct Array {
     assert(index < length);
     return data[index];
   }
-};
 
+  void allocate_storage(size_t length) {
+    this->length = length;
+    this->data = new Type[length];
+  }
+};

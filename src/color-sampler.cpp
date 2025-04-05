@@ -70,8 +70,7 @@ Image<Pixel_Type> resize_image(const unsigned width, const unsigned height, Imag
     .buffer = new Array<Pixel_Type>,
   };
 
-  image.buffer->length = width * height;
-  image.buffer->data  = new Pixel_Type[width * height];
+  image.buffer->allocate_storage(width * height);
   
   for (size_t x = 0; x < width; x++)
   {

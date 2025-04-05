@@ -136,8 +136,8 @@ Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file_data)
   *dib = extract_dib_file_header_from_byte_array(file_data);
   
   Array<uint8_t> *file_pixel_array = new Array<uint8_t>;
+  // @todo João, usar allocate_storage e depois copiar
   file_pixel_array->length = dib->size_of_data;
-  // @todo João, fazer uma cópia
   file_pixel_array->data = &file_data[header->offset];
 
   assert(&file_data.data[header->offset] == file_pixel_array->data);
@@ -187,9 +187,7 @@ void iterate_over_uncompressed_data(Bitmap_File *file, Filter_RGB_24bits func)
 static Array<RGB_24bits>* make_contiguous_array_out_of_pixel_storage(Bitmap_File &bitmap_file)
 {
   Array<RGB_24bits> *texture = new Array<RGB_24bits>;
-  
-  texture->length = bitmap_file.dib->image_width * bitmap_file.dib->image_height;
-  texture->data = new RGB_24bits[bitmap_file.dib->image_width * bitmap_file.dib->image_height];
+  texture->allocate_storage(bitmap_file.dib->image_width * bitmap_file.dib->image_height);
 
   const unsigned row_size_in_bytes = calculate_row_size(bitmap_file.dib->n_bit_per_pixel, bitmap_file.dib->image_width);
   
