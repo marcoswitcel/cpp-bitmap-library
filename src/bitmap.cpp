@@ -242,8 +242,7 @@ Bitmap_File make_bitmap_from_image_data(const unsigned width, const unsigned hei
 
   
   Byte_Array *pixel_array = new Byte_Array;
-  pixel_array->length = pixel_storage_needed_in_bytes;
-  pixel_array->data = new uint8_t[pixel_storage_needed_in_bytes];
+  pixel_array->allocate_storage(pixel_storage_needed_in_bytes);
 
   Bitmap_File new_file = {
     .header = header,
