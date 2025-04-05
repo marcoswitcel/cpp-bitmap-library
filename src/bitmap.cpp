@@ -136,11 +136,10 @@ Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file_data)
   *dib = extract_dib_file_header_from_byte_array(file_data);
   
   Array<uint8_t> *file_pixel_array = new Array<uint8_t>;
-  // @todo João, usar allocate_storage e depois copiar
-  file_pixel_array->length = dib->size_of_data;
-  file_pixel_array->data = &file_data[header->offset];
+  file_pixel_array->allocate_storage(dib->size_of_data);
 
-  assert(&file_data.data[header->offset] == file_pixel_array->data);
+  memcpy(file_pixel_array->data, &file_data[header->offset], dib->size_of_data);
+
   assert(file_pixel_array->length == (file_data.length - header->offset));
   
   Bitmap_File *bitmap_file = new Bitmap_File;

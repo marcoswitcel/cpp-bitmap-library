@@ -26,6 +26,11 @@ struct Array {
     return data[index];
   }
 
+  /**
+   * @brief inicializa o armazenamento necessário para o array
+   * 
+   * @param length 
+   */
   void allocate_storage(size_t length) {
     this->length = length;
     this->data = new Type[length];
