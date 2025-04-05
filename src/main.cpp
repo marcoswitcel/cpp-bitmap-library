@@ -349,7 +349,7 @@ int main(int argc, const char* argv[])
   {
     if (success)
     {
-      printf("Criado com sucesso. Arquivo: '%s'.\n", arguments.file_out);
+      printf("Arquivo criado com sucesso: '%s'.\n", arguments.file_out);
     }
     else
     {
