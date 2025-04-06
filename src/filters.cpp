@@ -87,3 +87,38 @@ Filter_Name lookup_filter_by_name(const char *name, bool *out)
 
   return filter_name;
 }
+
+void apply_filter_to_image(Image<RGB_24bits> &image, Filter_Name filter_name)
+{
+  Filter_RGB_24bits *func;
+
+  switch (filter_name)
+  {
+    case NONE: return;
+    case GRAY:
+      func = filter_RGB_24bits_gray;
+    break;
+    case LUMINOSITY:
+      func = filter_RGB_24bits_luminosity;
+    break;
+    case BLUE_CHANNEL:
+      func = filter_RGB_24bits_blue;
+    break;
+    case RED_CHANNEL:
+      func = filter_RGB_24bits_red;
+    break;
+    case GREEN_CHANNEL:
+      func = filter_RGB_24bits_green;
+    break;
+    default: return;
+  }
+  
+  for (unsigned row = 0; row < image.height; row++)
+  {
+    for (unsigned col = 0; col < image.width; col++)
+    {
+      RGB_24bits *pixel = &image.buffer->data[row * image.width + col];
+      func(pixel, pixel);
+    }
+  }
+}
