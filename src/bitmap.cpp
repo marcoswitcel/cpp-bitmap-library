@@ -29,23 +29,22 @@ using Byte_Array = Array<uint8_t>;
 Byte_Array read_file_as_byte_array(const char *file_path)
 {
   FILE *fd = fopen(file_path, "rb");
-  if (fd == NULL) {
+
+  if (fd == NULL)
+  {
     fprintf(stderr, "erro abrindo o arquivo: %s\n", file_path);
     exit(EXIT_FAILURE);
   }
+
   fseek(fd, 0, SEEK_END);
   size_t file_size = ftell(fd);
   fseek(fd, 0, SEEK_SET);
 
-  uint8_t *buffer = (uint8_t*) malloc(file_size * sizeof(uint8_t));
-  fread(buffer, file_size, 1, fd);
-
+  Byte_Array array;
+  array.allocate_storage(file_size);
+  
+  fread(array.data, file_size, 1, fd);
   fclose(fd);
-
-  Byte_Array array = {
-    .length = file_size, 
-    .data = buffer,
-  };
 
   return array;
 }
