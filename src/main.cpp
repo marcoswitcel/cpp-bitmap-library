@@ -103,15 +103,12 @@ void export_generated_image(bool verbose)
   }
 }
 
+void print_version_info(void);
+
 void print_help_info()
 {
-  std::cout << "Bitmap Tool\n";
-  #ifdef PROGRAM_VERSION
-  std::cout << "Versão: "<< PROGRAM_VERSION << "\n";
-  #endif
-  #ifdef BUILD_TIMESTAMP
-  std::cout << "Timestamp: "<< BUILD_TIMESTAMP << "\n";
-  #endif
+  print_version_info();
+
   std::cout << "\nInformação de uso:\n";
   std::cout << "Parâmetros obrigatórios:\n";
   std::cout << " --file-in: especifica o nome do arquivo de entrada\n";
@@ -128,7 +125,7 @@ void print_help_info()
 
 void print_version_info()
 {
-  std::cout << "Bitmap Tool\n";
+  std::cout << "Bitmap Tool\n\n";
   #ifdef PROGRAM_VERSION
   std::cout << "Versão: "<< PROGRAM_VERSION << "\n";
   #endif
