@@ -103,7 +103,16 @@ void export_generated_image(bool verbose)
   }
 }
 
-void print_version_info(void);
+void print_version_info()
+{
+  std::cout << "Bitmap Tool\n\n";
+  #ifdef PROGRAM_VERSION
+  std::cout << "Versão: "<< PROGRAM_VERSION << "\n";
+  #endif
+  #ifdef BUILD_TIMESTAMP
+  std::cout << "Timestamp: "<< BUILD_TIMESTAMP << "\n";
+  #endif
+}
 
 void print_help_info()
 {
@@ -123,16 +132,6 @@ void print_help_info()
   std::cout << " --filter: especifica o nome do filtro a ser aplicado\n"; // @todo João, listar aqui os nomes dos filtros
 }
 
-void print_version_info()
-{
-  std::cout << "Bitmap Tool\n\n";
-  #ifdef PROGRAM_VERSION
-  std::cout << "Versão: "<< PROGRAM_VERSION << "\n";
-  #endif
-  #ifdef BUILD_TIMESTAMP
-  std::cout << "Timestamp: "<< BUILD_TIMESTAMP << "\n";
-  #endif
-}
 
 typedef struct Command_Line_Arguments {
   bool is_generated_image;
