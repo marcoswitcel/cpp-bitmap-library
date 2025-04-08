@@ -20,6 +20,20 @@ struct Array {
    */
   Type *data;
 
+  Array() {}
+
+  Array(size_t length)
+  {
+    this->length = length;
+    this->data = new Type[length];
+  }
+  
+  Array(size_t length, Type *data)
+  {
+    this->length = length;
+    this->data = data;
+  }
+
   Type& operator[](size_t index)
   {
     assert(index < length);

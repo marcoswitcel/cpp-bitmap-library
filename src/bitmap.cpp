@@ -40,8 +40,7 @@ Byte_Array read_file_as_byte_array(const char *file_path)
   size_t file_size = ftell(fd);
   fseek(fd, 0, SEEK_SET);
 
-  Byte_Array array;
-  array.allocate_storage(file_size);
+  Byte_Array array(file_size);
   
   fread(array.data, file_size, 1, fd);
   fclose(fd);
@@ -134,8 +133,7 @@ Bitmap_File* make_bitmap_out_of_file(Array<uint8_t> &file_data)
   DIB_Header *dib = new DIB_Header;
   *dib = extract_dib_file_header_from_byte_array(file_data);
   
-  Array<uint8_t> *file_pixel_array = new Array<uint8_t>;
-  file_pixel_array->allocate_storage(dib->size_of_data);
+  Array<uint8_t> *file_pixel_array = new Array<uint8_t>(dib->size_of_data);
 
   memcpy(file_pixel_array->data, &file_data[header->offset], dib->size_of_data);
 
@@ -184,8 +182,7 @@ void iterate_over_uncompressed_data(Bitmap_File *file, Filter_RGB_24bits func)
 
 static Array<RGB_24bits>* make_contiguous_array_out_of_pixel_storage(Bitmap_File &bitmap_file)
 {
-  Array<RGB_24bits> *texture = new Array<RGB_24bits>;
-  texture->allocate_storage(bitmap_file.dib->image_width * bitmap_file.dib->image_height);
+  Array<RGB_24bits> *texture = new Array<RGB_24bits>(bitmap_file.dib->image_width * bitmap_file.dib->image_height);
 
   const unsigned row_size_in_bytes = calculate_row_size(bitmap_file.dib->n_bit_per_pixel, bitmap_file.dib->image_width);
   
@@ -240,8 +237,7 @@ Bitmap_File make_bitmap_from_image_data(const unsigned width, const unsigned hei
   dib->important_colors = 0;
 
   
-  Byte_Array *pixel_array = new Byte_Array;
-  pixel_array->allocate_storage(pixel_storage_needed_in_bytes);
+  Byte_Array *pixel_array = new Byte_Array(pixel_storage_needed_in_bytes);
 
   Bitmap_File new_file = {
     .header = header,

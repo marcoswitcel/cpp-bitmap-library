@@ -44,10 +44,7 @@ void export_sample_01_2x2_image(bool verbose)
   };
 
   uint8_t data[] = { 0, 0, 255, 255, 255, 255, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, };
-  Byte_Array pixel_array = {
-    .length = 16,
-    .data = (uint8_t *) &data,
-  };
+  Byte_Array pixel_array(16 , (uint8_t *) &data);
 
   Bitmap_File new_file = {
     .header = &header,
@@ -74,10 +71,7 @@ void export_generated_image(bool verbose)
   const unsigned width = 1920;
   const unsigned height = 1080;
 
-  Array<RGB_24bits> image = {
-    .length = width * height,
-    .data = new RGB_24bits[width * height],
-  };
+  Array<RGB_24bits> image(width * height);
 
   for (size_t i = 0; i < image.length; i++)
   {
