@@ -28,12 +28,24 @@ struct Array {
     this->data = new Type[length];
   }
   
+  /**
+   * @brief Constrói um array com length e um data pointer providos
+   * 
+   * @param length 
+   * @param data 
+   */
   Array(size_t length, Type *data)
   {
     this->length = length;
     this->data = data;
   }
 
+  /**
+   * @brief facilita o acesso aos valores
+   * 
+   * @param index 
+   * @return Type& 
+   */
   Type& operator[](size_t index)
   {
     assert(index < length);
