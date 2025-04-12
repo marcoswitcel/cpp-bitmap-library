@@ -123,7 +123,14 @@ void print_help_info()
   std::cout << " --version: exibe versão do build\n";
   std::cout << " --file-out: especifica o nome do arquivo de saída\n";
   std::cout << " --verbose: especifica se deve ou não descrever as operações através do output\n";
-  std::cout << " --filter: especifica o nome do filtro a ser aplicado\n"; // @todo João, listar aqui os nomes dos filtros
+  std::cout << " --filter: especifica o nome do filtro a ser aplicado. Opções: ";
+  for (unsigned i = 0; i < filter_name_length; i++)
+  {
+    std::cout << filter_name_as_cstring[i];
+
+    if (i == filter_name_length - 1) std::cout << ".\n";
+    else std::cout << ", ";
+  }
 }
 
 
