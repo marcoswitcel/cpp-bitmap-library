@@ -1,5 +1,5 @@
 # Implementando
 
-Encontrar um referência
-Encontrar uma imagem para testar
-Implementar o Header
+Encontrar um referência -- ok
+Encontrar uma imagem para testar -- ok
+Implementar o Header -- ok
